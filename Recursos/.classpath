@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-beanutils-1.9.3.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-codec-1.11.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-collections4-4.2.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-compress-1.18.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-digester-1.8.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-io-2.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="libs/Apache Commons/commons-math3-3.6.1.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/curvesapi-1.05.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/jaxb-api-2.3.0.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/jaxb-core-2.3.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/jaxb-impl-2.3.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI - Dependencies/xmlbeans-3.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI/poi-4.0.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI/poi-4.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI/poi-excelant-4.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI/poi-ooxml-4.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI/poi-ooxml-schemas-4.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/Apache POI/poi-scratchpad-4.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/iText PDF/itext-patched-2.1.7.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-chart-customizers-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-chart-themes-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-custom-visualization-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-fonts-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-functions-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/jasperreports-javaflow-6.7.0.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/spring-beans-5.0.9.jar"/>
+	<classpathentry kind="lib" path="libs/Jasper Reports/spring-core-5.0.9.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Phills Libs"/>
+	<classpathentry kind="lib" path="libs/JDatePicker/jdatepicker-1.3.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

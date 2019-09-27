@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Recursos" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a916fcdd-52db-4f6d-a31d-e61807a79453">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<style name="Textos Estáticos" fontSize="11" isBold="true"/>
+	<style name="Textos Dinâmicos" fontSize="11"/>
+	<parameter name="PAR_EDITAL" class="java.lang.String"/>
+	<parameter name="PAR_LOGO" class="java.awt.image.BufferedImage"/>
+	<parameter name="PAR_DATA_PUBLICACAO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="disciplina" class="java.lang.String"/>
+	<field name="questionamento" class="java.lang.String"/>
+	<field name="questao" class="java.lang.Integer"/>
+	<field name="interessado" class="java.lang.String"/>
+	<field name="parecer" class="java.lang.String"/>
+	<field name="resposta" class="java.lang.String"/>
+	<field name="cargo" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="375" splitType="Prevent">
+			<textField>
+				<reportElement style="Textos Dinâmicos" x="105" y="155" width="450" height="15" uuid="5956059b-0483-406d-b8a4-935a6793df3c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{disciplina}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Textos Estáticos" x="0" y="155" width="100" height="15" uuid="9df33880-56f6-4c9d-9dfd-08de6445410d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Disciplina:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Textos Dinâmicos" x="0" y="235" width="555" height="20" uuid="28ca5fae-38bc-4a1c-ba27-52a6e22de93e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{questionamento}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Textos Estáticos" x="0" y="215" width="110" height="15" uuid="a10f2a5a-847e-4879-bf70-83cf4235a548"/>
+				<text><![CDATA[Questionamento:]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="4" width="555" height="60" uuid="18ac0eb9-e610-4eb0-8e7f-2a39858d289f"/>
+				<imageExpression><![CDATA[$P{PAR_LOGO}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="80" width="555" height="20" uuid="b92d5db7-aae8-4cb5-948d-5e1277e0a948"/>
+				<textElement textAlignment="Center">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Resposta a Recurso contra Questão de Prova]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="104" width="555" height="16" uuid="4f878eb1-4101-400c-9199-0bc38fff753a"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PAR_EDITAL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Textos Estáticos" x="0" y="170" width="100" height="15" uuid="2b67077b-cc11-477f-a26c-0b5238cab7b4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<text><![CDATA[N° da Questão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Textos Dinâmicos" x="105" y="170" width="450" height="15" uuid="658c2d46-9bd9-4b66-99e5-1a4e29318f56">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{questao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Textos Estáticos" x="0" y="185" width="100" height="15" uuid="51b188b3-0c24-4b19-82a7-0d15443e968e">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<text><![CDATA[Interessado(a):]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Textos Dinâmicos" x="105" y="185" width="450" height="15" uuid="fa467a11-c140-4a4e-81f3-c6f9a2b0104a">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{interessado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Textos Estáticos" positionType="Float" x="0" y="265" width="110" height="15" uuid="ef39aeaa-7261-4790-9edb-6d42ff253ae7">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<text><![CDATA[Parecer:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Textos Dinâmicos" positionType="Float" x="0" y="285" width="555" height="20" uuid="0d92910c-0e70-4328-bcfe-341015accccc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{parecer}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Textos Estáticos" positionType="Float" x="0" y="315" width="65" height="15" uuid="5bef8d68-e9c0-4aca-88a3-763bb5bb5b4b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<text><![CDATA[Resposta:]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Textos Dinâmicos" positionType="Float" x="72" y="315" width="483" height="15" uuid="a572e186-e70d-49ed-bcb6-d92c5b29335b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{resposta}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="0" y="345" width="555" height="20" uuid="c6e018e3-a7a1-4e73-98e6-ec3fdb451584">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" markup="html">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Data de Publicação:</b> " + $P{PAR_DATA_PUBLICACAO}]]></textFieldExpression>
+			</textField>
+			<break>
+				<reportElement positionType="Float" x="0" y="370" width="554" height="1" uuid="e8f53f4d-f850-439f-9abe-23929783861a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</break>
+			<staticText>
+				<reportElement style="Textos Estáticos" x="0" y="140" width="100" height="15" uuid="efd1ada4-4f80-4e30-8ac4-867a5b52d756">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Cargo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Textos Dinâmicos" x="105" y="140" width="450" height="15" uuid="8907fe49-49f7-48cb-ab77-d2c484c11809">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{cargo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
