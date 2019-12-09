@@ -12,7 +12,7 @@ public class ExcelReader {
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
 	private static final DataFormatter    DATA_FORMATTER = new DataFormatter(Locale.getDefault());
 	
-	public static void read(File planilha, ArrayList<Recurso> listaRecursos) throws Exception {
+	public static void read(File planilha, String[] colunas, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		// Preparando o ambiente...
 		FileInputStream stream           = new FileInputStream(planilha);
@@ -28,7 +28,7 @@ public class ExcelReader {
 			
 			// Carregando um Recurso da planilha
 			Row row = rowIterator.next();
-			Recurso recurso = extractRecurso(row,getIndices(INDICES));
+			Recurso recurso = extractRecurso(row,getIndices(colunas));
 			
 			// Só é pra acontecer quando eu chegar numa linha vazia
 			if (recurso == null)
@@ -58,38 +58,44 @@ public class ExcelReader {
 			return null;
 		
 		// Extração de dados das células do Excel
-		String disciplina = getCellContent(first_cell);
-		String num_questao = getCellContent(row.getCell(INDICES[1]));
-		String nome_interessado = getCellContent(row.getCell(INDICES[2]));
-		String questionamento = getCellContent(row.getCell(INDICES[3]));
-		String parecer = getCellContent(row.getCell(INDICES[4]));
-		String resposta = getCellContent(row.getCell(INDICES[5]));
-		String cargo = "PSC2022 - Primeira Etapa";//getCellContent(row.getCell(INDICES[6]));
+		String num_inscricao    = getCellContent(first_cell);
+		String nome_interessado = getCellContent(row.getCell(INDICES[1]));
+		String disciplina       = getCellContent(row.getCell(INDICES[2]));
+		String num_questao      = getCellContent(row.getCell(INDICES[3]));
+		String questionamento   = getCellContent(row.getCell(INDICES[4]));
+		String solic_alteracao  = getCellContent(row.getCell(INDICES[5]));
+		String parecer          = getCellContent(row.getCell(INDICES[6]));
+		String resposta         = getCellContent(row.getCell(INDICES[7]));
+		
+		// String cargo            = (isPSC) ? null : getCellContent(row.getCell(INDICES[8]));
 
 		// Alimentando uma nova classe 'Recurso'
 		Recurso recurso = new Recurso();
+		
+		recurso.setInscricao(num_inscricao);
+		recurso.setNomeInteressado(nome_interessado);
 		recurso.setDisciplina(disciplina);
 		recurso.setNumQuestao(num_questao);
-		recurso.setNomeInteressado(nome_interessado);
 		recurso.setQuestionamento(questionamento);
+		recurso.setAlteracao(solic_alteracao);
 		recurso.setParecer(parecer);
 		recurso.setResposta(resposta);
-		recurso.setCargo(cargo);
+		//recurso.setCargo(cargo);
 		
 		return recurso;
 	}
 
-	/** 1. Disciplina
-	 *  2. Número de Questão
-	 *  3. Nome do Interessado
-	 *  4. Questionamento
-	 *  5. Parecer
-	 *  6. Resposta
-	 *  7. Cargo */
-	private static final String[] INDICES = new String[]{"D","E","C","F","H","I"};
+	/** 1. Número de Inscrição
+	 *  2. Nome do Interessado
+	 *  3. Disciplina
+	 *  4. Número da Questão
+	 *  5. Questionamento (Candidato)
+	 *  6. Alteração (Candidato)
+	 *  7. Parecer (Banca)
+	 *  8. Resposta (Banca)  */
 	private static int[] getIndices(String[] colunas) {
 		
-		final int size = INDICES.length;
+		final int size = colunas.length;
 		int[] indices = new int[size];
 		
 		for (int i=0; i<size; i++)

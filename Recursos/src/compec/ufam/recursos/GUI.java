@@ -39,6 +39,8 @@ public class GUI extends JFrame {
 	private JButton buttonSair;
 	private JButton buttonLimpar;
 	private JButton buttonProcessar;
+	
+	private static final String[] colunas = new String[]{"B","C","D","E","F","G","H","I"};
 
 	public static void main(String[] args) {
 		new GUI();
@@ -50,7 +52,7 @@ public class GUI extends JFrame {
 		Font  fonte = helper.getFont ();
 		Color color = helper.getColor();
 		
-		setSize(720,300);
+		setSize(720,350);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
@@ -133,7 +135,7 @@ public class GUI extends JFrame {
 		textOBS = new JLabel();
 		textOBS.setFont(fonte);
 		textOBS.setForeground(color);
-		textOBS.setBounds(44, 232, 528, 35);
+		textOBS.setBounds(44, 232, 528, 75);
 		textOBS.setVisible(false);
 		getContentPane().add(textOBS);
 		
@@ -274,6 +276,8 @@ public class GUI extends JFrame {
 		
 	}
 	
+	boolean isPSC = true;
+	
 	private void util_process(String edital, String data_publicacao) {
 		
 		// Variáveis de controle da view
@@ -286,20 +290,27 @@ public class GUI extends JFrame {
 		// Se o diretório de origem for legível...
 		if (dir_origem.canRead()) {
 			
-			// ...vou varrendo-o...
-			for (File sub_dir: dir_origem.listFiles()) {
-				
-				// ...em busca de subdiretórios acessíveis...
-				if (sub_dir.isDirectory() && sub_dir.canRead()) {
+			// No PSC, processo apenas o diretório raiz
+			if (isPSC)
+				status = core_parse_dir(edital, data_publicacao, dir_origem);
+			
+			else {
+			
+				// ...vou varrendo-o...
+				for (File sub_dir: dir_origem.listFiles()) {
 					
-					// ...e, processando estes subdiretórios
-					dir_proc++;
-					status = core_parse_dir(edital, data_publicacao, sub_dir);
-					
-					// Caso dê alguma falha no processamento do subdiretório, sinalizo nesta variável
-					if (!status)
-						success = false;
-					
+					// ...em busca de subdiretórios acessíveis...
+					if (sub_dir.isDirectory() && sub_dir.canRead()) {
+						
+						// ...e, processando estes subdiretórios
+						dir_proc++;
+						status = core_parse_dir(edital, data_publicacao, sub_dir);
+						
+						// Caso dê alguma falha no processamento do subdiretório, sinalizo nesta variável
+						if (!status)
+							success = false;
+						
+					}
 				}
 			}
 		}
@@ -345,9 +356,6 @@ public class GUI extends JFrame {
 	
 	
 	
-	
-	
-	
 	public boolean core_parse_dir(String edital, String data_publicacao, File dir_planilhas) {
 
 		/******************** Leitura das Planilhas *************************/
@@ -366,7 +374,7 @@ public class GUI extends JFrame {
 					fil_proc++;
 					util_obs_reading(dir_planilhas,arquivo);
 					
-					ExcelReader.read(arquivo,listaRecursos);
+					ExcelReader.read(arquivo,colunas,listaRecursos);
 					
 				}
 				
@@ -409,6 +417,9 @@ public class GUI extends JFrame {
 	}
 	
 	private File util_pdf_filename(ArrayList<Recurso> listaRecursos) {
+		
+		if (isPSC)
+			return new File(dir_destino.getAbsolutePath() + "/PSC (Todos).pdf");
 		
 		// Instanciando meu builder
 		StringBuilder builder = new StringBuilder();

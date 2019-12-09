@@ -11,6 +11,8 @@ public class Recurso {
 	private String parecer;
 	private String resposta;
 	private String cargo;
+	private String alteracao;
+	private String num_inscricao;
 
 	/************************ Bloco de Setters **************************/
 	
@@ -47,6 +49,14 @@ public class Recurso {
 	public void setCargo(String cargo) {
 		this.cargo = cargo.trim();
 	}
+	
+	public void setInscricao(String num_inscricao) {
+		this.num_inscricao = num_inscricao;
+	}
+	
+	public void setAlteracao(String alteracao) {
+		this.alteracao = alteracao.trim();
+	}
 
 	/************************ Bloco de Getters **************************/	
 	
@@ -76,6 +86,14 @@ public class Recurso {
 	
 	public String getCargo() {
 		return cargo;
+	}
+	
+	public String getInscricao() {
+		return num_inscricao;
+	}
+	
+	public String getAlteracao() {
+		return alteracao;
 	}
 	
 }
