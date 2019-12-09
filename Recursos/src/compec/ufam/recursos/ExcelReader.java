@@ -4,20 +4,20 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
 	private static final DataFormatter    DATA_FORMATTER = new DataFormatter(Locale.getDefault());
-	public static final int[] INDICES = new int[]{4,5,2,6,8,9,3};
 	
 	public static void read(File planilha, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		// Preparando o ambiente...
 		FileInputStream stream           = new FileInputStream(planilha);
 		XSSFWorkbook workbook            = new XSSFWorkbook(stream);
-		XSSFSheet sheet                  = workbook.getSheet("Planilha2");
+		XSSFSheet sheet                  = workbook.getSheetAt(0);
 		Iterator<Row> rowIterator        = sheet.iterator();
 		
 		// Pulando a primeira linha da planilha (cabeçalho)
@@ -28,7 +28,7 @@ public class ExcelReader {
 			
 			// Carregando um Recurso da planilha
 			Row row = rowIterator.next();
-			Recurso recurso = extractRecurso(row,INDICES);
+			Recurso recurso = extractRecurso(row,getIndices(INDICES));
 			
 			// Só é pra acontecer quando eu chegar numa linha vazia
 			if (recurso == null)
@@ -64,7 +64,7 @@ public class ExcelReader {
 		String questionamento = getCellContent(row.getCell(INDICES[3]));
 		String parecer = getCellContent(row.getCell(INDICES[4]));
 		String resposta = getCellContent(row.getCell(INDICES[5]));
-		String cargo = getCellContent(row.getCell(INDICES[6]));
+		String cargo = "PSC2022 - Primeira Etapa";//getCellContent(row.getCell(INDICES[6]));
 
 		// Alimentando uma nova classe 'Recurso'
 		Recurso recurso = new Recurso();
@@ -77,6 +77,25 @@ public class ExcelReader {
 		recurso.setCargo(cargo);
 		
 		return recurso;
+	}
+
+	/** 1. Disciplina
+	 *  2. Número de Questão
+	 *  3. Nome do Interessado
+	 *  4. Questionamento
+	 *  5. Parecer
+	 *  6. Resposta
+	 *  7. Cargo */
+	private static final String[] INDICES = new String[]{"D","E","C","F","H","I"};
+	private static int[] getIndices(String[] colunas) {
+		
+		final int size = INDICES.length;
+		int[] indices = new int[size];
+		
+		for (int i=0; i<size; i++)
+			indices[i] = CellReference.convertColStringToIndex(colunas[i]);
+		
+		return indices;
 	}
 	
 	/** Extrai o conteúdo de uma célula do Excel */
