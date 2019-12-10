@@ -39,8 +39,6 @@ public class DatePicker {
 		textField.setFont(GraphicsHelper.getInstance().getFont());
 		textField.setForeground(GraphicsHelper.getInstance().getColor());
 		
-		datePicker.setSize(202, 25);
-		
 		return datePicker;
 	}
 	

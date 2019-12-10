@@ -30,7 +30,7 @@ public class ExcelReader {
 			
 			// Carregando um Recurso da planilha
 			Row row = rowIterator.next();
-			Recurso recurso = extractRecurso(row,getIndices(colunas));
+			Recurso recurso = extractRecurso(row,getIndices(colunas),planilha.getName());
 			
 			// Só é pra acontecer quando eu chegar numa linha vazia
 			if (recurso == null)
@@ -47,7 +47,7 @@ public class ExcelReader {
 	
 	/** Carrega um Recurso a partir de uma 'row' da planilha. Os campos
 	 *  de dados são configurados de acordo com o parâmetro 'sheetIndexes'. */
-	private static Recurso extractRecurso(Row row, int[] INDICES) {
+	private static Recurso extractRecurso(Row row, int[] INDICES, String planilha) {
 		
 		// Aqui verifico se a primeira célula de uma linha é vazia
 		Cell first_cell = row.getCell(INDICES[0]);
@@ -60,18 +60,18 @@ public class ExcelReader {
 			return null;
 		
 		// Extração de dados das células do Excel
-		String nome_interessado = getCellContent(row.getCell(INDICES[1]));
-		String disciplina       = getCellContent(row.getCell(INDICES[2]));
-		String num_questao      = getCellContent(row.getCell(INDICES[3]));
-		String questionamento   = getCellContent(row.getCell(INDICES[4]));
-		String solic_alteracao  = getCellContent(row.getCell(INDICES[5]));
-		String parecer          = getCellContent(row.getCell(INDICES[6]));
-		String resposta         = getCellContent(row.getCell(INDICES[7]));
+		String nome_interessado = getCellContent(first_cell);
+		String disciplina       = getCellContent(row.getCell(INDICES[1]));
+		String num_questao      = getCellContent(row.getCell(INDICES[2]));
+		String questionamento   = getCellContent(row.getCell(INDICES[3]));
+		String solic_alteracao  = getCellContent(row.getCell(INDICES[4]));
+		String parecer          = getCellContent(row.getCell(INDICES[5]));
+		String resposta         = getCellContent(row.getCell(INDICES[6]));
 		
 		// String cargo            = (isPSC) ? null : getCellContent(row.getCell(INDICES[8]));
 
 		// Alimentando uma nova classe 'Recurso'
-		Recurso recurso = new Recurso(row.getRowNum());
+		Recurso recurso = new Recurso(row.getRowNum(),planilha);
 		
 		recurso.setNomeInteressado(nome_interessado);
 		recurso.setDisciplina(disciplina);
@@ -85,14 +85,14 @@ public class ExcelReader {
 		return recurso;
 	}
 
-	/** 1. Número de Inscrição
-	 *  2. Nome do Interessado
-	 *  3. Disciplina
-	 *  4. Número da Questão
-	 *  5. Questionamento (Candidato)
-	 *  6. Alteração (Candidato)
-	 *  7. Parecer (Banca)
-	 *  8. Resposta (Banca)  */
+	/** 
+	 *  1. Nome do Interessado
+	 *  2. Disciplina
+	 *  3. Número da Questão
+	 *  4. Questionamento (Candidato)
+	 *  5. Alteração (Candidato)
+	 *  6. Parecer (Banca)
+	 *  7. Resposta (Banca)  */
 	private static int[] getIndices(String[] colunas) {
 		
 		final int size = colunas.length;

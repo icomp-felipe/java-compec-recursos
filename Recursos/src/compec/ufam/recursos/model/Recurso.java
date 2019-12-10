@@ -9,6 +9,7 @@ public class Recurso {
 	
 	/** Atributo útil para debug de erros de processamento de planilha */
 	private final int linha_excel;
+	private final String planilha;
 
 	private String disciplina;
 	private int num_questao;
@@ -21,8 +22,9 @@ public class Recurso {
 	private String cargo;
 	
 	/** Construtor apenas seta a linha da planilha de onde estão vindo os dados */
-	public Recurso(int linha_excel) {
+	public Recurso(int linha_excel, String planilha) {
 		this.linha_excel = linha_excel;
+		this.planilha = planilha;
 	}
 
 	/************************ Bloco de Setters **************************/
@@ -158,7 +160,7 @@ public class Recurso {
 	 *  [WRN: num_linha_planilha] mensagem
 	 *  @param msg - mensagem de log */
 	private void log(String msg) {
-		System.err.printf("[WRN:%d] %s\n",this.linha_excel,msg);
+		System.err.printf("[WRN] '%s'@%d %s\n",this.planilha,this.linha_excel,msg);
 	}
 	
 	/** Verifica se uma string é nula ou vazia

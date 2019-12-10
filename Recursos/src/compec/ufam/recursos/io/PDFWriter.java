@@ -1,4 +1,4 @@
-package compec.ufam.recursos;
+package compec.ufam.recursos.io;
 
 import java.io.*;
 import java.util.*;
@@ -7,6 +7,7 @@ import java.awt.image.*;
 import com.phill.libs.*;
 
 import compec.ufam.recursos.model.Recurso;
+import compec.ufam.recursos.model.TipoConcurso;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.*;
 import net.sf.jasperreports.engine.util.*;
@@ -14,18 +15,18 @@ import net.sf.jasperreports.view.*;
 
 public class PDFWriter {
 	
-	public static void export(String edital, String data_publicacao, ArrayList<Recurso> listaRecursos, File arquivo) throws Exception {
+	public static void export(String edital, String data_publicacao, TipoConcurso concurso, ArrayList<Recurso> listaRecursos, File arquivo) throws Exception {
 		
 		/** Inflando o relatório */
-		JasperPrint  prints = prepare(edital, data_publicacao, listaRecursos);
+		JasperPrint  prints = prepare(edital, data_publicacao, concurso, listaRecursos);
 		JasperExportManager.exportReportToPdfFile(prints, arquivo.getAbsolutePath());
 		
 	}
 	
-	public static void show(String edital, String data_publicacao, ArrayList<Recurso> listaRecursos) throws Exception {
+	public static void show(String edital, String data_publicacao, TipoConcurso concurso, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		/** Inflando o relatório */
-		JasperPrint  prints = prepare(edital, data_publicacao, listaRecursos);
+		JasperPrint  prints = prepare(edital, data_publicacao, concurso, listaRecursos);
 		
 		/** Enfeitando a visualização do Jasper */
 		JasperViewer jrv = new JasperViewer(prints,false);
@@ -34,10 +35,10 @@ public class PDFWriter {
 		
 	}
 	
-	private static JasperPrint prepare(String edital, String data_publicacao, ArrayList<Recurso> listaRecursos) throws Exception {
+	private static JasperPrint prepare(String edital, String data_publicacao, TipoConcurso concurso, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		/** Leitura dos arquivos */
-		File     reportPath = ResourceManager.getResourceAsFile("reports/Recursos.jasper");
+		File     reportPath = concurso.getReport();
 		BufferedImage  logo = ImageIO.read(ResourceManager.getResourceAsFile("img/logo.jpg"));
 		JasperReport report = (JasperReport) JRLoader.loadObject(reportPath);
 		
