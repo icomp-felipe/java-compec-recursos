@@ -5,6 +5,8 @@ import java.util.*;
 import javax.imageio.*;
 import java.awt.image.*;
 import com.phill.libs.*;
+
+import compec.ufam.recursos.model.Recurso;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.*;
 import net.sf.jasperreports.engine.util.*;

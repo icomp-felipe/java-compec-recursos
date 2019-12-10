@@ -3,6 +3,8 @@ package compec.ufam.recursos;
 import java.util.*;
 import java.util.stream.*;
 
+import compec.ufam.recursos.model.Recurso;
+
 public class ListSorter {
 	
 	public static ArrayList<Recurso> sort(ArrayList<Recurso> listaRecursos) {

@@ -7,6 +7,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 
+import compec.ufam.recursos.model.Recurso;
+
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
@@ -58,7 +60,6 @@ public class ExcelReader {
 			return null;
 		
 		// Extração de dados das células do Excel
-		String num_inscricao    = getCellContent(first_cell);
 		String nome_interessado = getCellContent(row.getCell(INDICES[1]));
 		String disciplina       = getCellContent(row.getCell(INDICES[2]));
 		String num_questao      = getCellContent(row.getCell(INDICES[3]));
@@ -70,9 +71,8 @@ public class ExcelReader {
 		// String cargo            = (isPSC) ? null : getCellContent(row.getCell(INDICES[8]));
 
 		// Alimentando uma nova classe 'Recurso'
-		Recurso recurso = new Recurso();
+		Recurso recurso = new Recurso(row.getRowNum());
 		
-		recurso.setInscricao(num_inscricao);
 		recurso.setNomeInteressado(nome_interessado);
 		recurso.setDisciplina(disciplina);
 		recurso.setNumQuestao(num_questao);

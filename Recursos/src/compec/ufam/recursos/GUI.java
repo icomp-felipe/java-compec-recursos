@@ -17,6 +17,8 @@ import com.phill.libs.FileChooserHelper;
 import com.phill.libs.GraphicsHelper;
 import com.phill.libs.ResourceManager;
 
+import compec.ufam.recursos.model.Recurso;
+
 public class GUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -47,6 +49,7 @@ public class GUI extends JFrame {
 	}
 
 	public GUI() {
+		
 		super("Processador de Recursos");
 		
 		Font  fonte = helper.getFont ();
