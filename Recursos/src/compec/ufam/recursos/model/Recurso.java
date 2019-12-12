@@ -1,5 +1,8 @@
 package compec.ufam.recursos.model;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.phill.libs.StringUtils;
 
 /** Implementa a modelagem de um recurso
@@ -167,6 +170,43 @@ public class Recurso {
 	 *  @param string - string */
 	private boolean isEmpty(String string) {
 		return ((string == null) || string.trim().isEmpty());
+	}
+	
+	/** Verifica se o número de questão está fora do intervalo de questões deste recurso */
+	public boolean foraIntervalo() {
+		
+		final int[] interval = getInterval();
+		final boolean result = !(this.num_questao >= interval[0] && this.num_questao <= interval[1]);
+		
+		if (result)
+			log("Número de questão fora do intervalo");
+		
+		return result;
+		
+	}
+	
+	/** Retorna um array com o intervalo de questões (extraído da string de disciplina) */
+	private int[] getInterval() {
+		
+		Pattern pattern = Pattern.compile("\\d+");
+		
+		Matcher matcher = pattern.matcher(this.disciplina);
+		matcher.find();
+		
+		String first_num_str = matcher.group();
+		
+		String original_without_first_num = this.disciplina.substring(this.disciplina.indexOf(first_num_str)).replace(first_num_str,"");
+		
+		matcher = pattern.matcher(original_without_first_num);
+		matcher.find();
+		
+		String second_num_str = matcher.group();
+		
+		int first_num = Integer.valueOf(first_num_str);
+		int second_num = Integer.valueOf(second_num_str);
+		
+		return new int[] {first_num,second_num};
+		
 	}
 	
 }

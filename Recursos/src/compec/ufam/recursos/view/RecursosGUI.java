@@ -25,6 +25,7 @@ import com.phill.libs.TableUtils;
 
 import compec.ufam.recursos.DatePicker;
 import compec.ufam.recursos.ExcelReader;
+import compec.ufam.recursos.ListParser;
 import compec.ufam.recursos.ListSorter;
 import compec.ufam.recursos.io.PDFWriter;
 import compec.ufam.recursos.model.Recurso;
@@ -573,6 +574,10 @@ public class RecursosGUI extends JFrame {
 			
 			ArrayList<Recurso> listaOrdenada = ListSorter.sort(listaRecursos);
 			
+			
+			/*********************** Verificação de Dados ***********************/
+			//ListParser.parseIntervalo(listaOrdenada);
+			ListParser.parseDouble   (listaOrdenada);
 			
 			/************************* Geração de PDF ***************************/
 			
