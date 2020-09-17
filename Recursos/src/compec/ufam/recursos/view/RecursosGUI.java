@@ -15,13 +15,13 @@ import javax.swing.table.TableColumnModel;
 
 import org.jdatepicker.impl.JDatePickerImpl;
 
-import com.phill.libs.AlertDialog;
+import com.phill.libs.ui.AlertDialog;
 import com.phill.libs.FileChooserHelper;
 import com.phill.libs.GraphicsHelper;
 import com.phill.libs.PropertiesManager;
 import com.phill.libs.ResourceManager;
-import com.phill.libs.TableMouseListener;
 import com.phill.libs.TableUtils;
+import com.phill.libs.table.JTableMouseListener;
 
 import compec.ufam.recursos.DatePicker;
 import compec.ufam.recursos.ExcelReader;
@@ -122,7 +122,7 @@ public class RecursosGUI extends JFrame {
 		
 		tablePlanilha = new JTable(modelo);
 		tablePlanilha.setOpaque(false);
-		tablePlanilha.addMouseListener(new TableMouseListener(tablePlanilha));
+		tablePlanilha.addMouseListener(new JTableMouseListener(tablePlanilha));
 		tablePlanilha.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -302,13 +302,13 @@ public class RecursosGUI extends JFrame {
 			PropertiesManager.setProperty(this.concursoAtual.getColumns(),columns);
 			
 			// Alertando usuário
-			AlertDialog.informativo("Configuração de planilha salva com sucesso!");
+			AlertDialog.info("Configuração de planilha salva com sucesso!");
 		
 		}
 		catch (Exception exception) {
 			
 			exception.printStackTrace();
-			AlertDialog.erro("Salvando configuração","Houve algum erro durante o salvamento de configuração.\nFavor consultar o console para mais infos.");
+			AlertDialog.error("Salvando configuração","Houve algum erro durante o salvamento de configuração.\nFavor consultar o console para mais infos.");
 			
 		}
 		finally {
@@ -333,7 +333,7 @@ public class RecursosGUI extends JFrame {
 			
 		}
 		catch (NullPointerException exception) { }
-		catch (Exception exception) { AlertDialog.erro("Não foi possível carregar o diretório"); }
+		catch (Exception exception) { AlertDialog.error("Não foi possível carregar o diretório"); }
 		
 	}
 	
@@ -353,7 +353,7 @@ public class RecursosGUI extends JFrame {
 			
 		}
 		catch (NullPointerException exception) { }
-		catch (Exception exception) { AlertDialog.erro("Não foi possível carregar o diretório"); }
+		catch (Exception exception) { AlertDialog.error("Não foi possível carregar o diretório"); }
 		
 	}
 	
@@ -370,7 +370,7 @@ public class RecursosGUI extends JFrame {
 		// Simples tratamento de erros
 		if (columnNames.length != columns.length) {
 			
-			AlertDialog.erro("Configuração de Planilhas","Configuração inválida, favor conferir arquivo de propriedades");
+			AlertDialog.error("Configuração de Planilhas","Configuração inválida, favor conferir arquivo de propriedades");
 			return;
 			
 		}
@@ -444,22 +444,22 @@ public class RecursosGUI extends JFrame {
 	private boolean util_parse_view(String edital, String data) {
 		
 		if (edital.equals("")) {
-			AlertDialog.erro("Preencha o nome do edital");
+			AlertDialog.error("Preencha o nome do edital");
 			return false;
 		}
 		
 		if (data.equals("")) {
-			AlertDialog.erro("Selecione uma data");
+			AlertDialog.error("Selecione uma data");
 			return false;
 		}
 		
 		if (dir_origem == null) {
-			AlertDialog.erro("Selecione a pasta de origem");
+			AlertDialog.error("Selecione a pasta de origem");
 			return false;
 		}
 		
 		if (dir_destino == null) {
-			AlertDialog.erro("Selecione a pasta de destino");
+			AlertDialog.error("Selecione a pasta de destino");
 			return false;
 		}
 		
