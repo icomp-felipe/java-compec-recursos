@@ -11,7 +11,7 @@ import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
-import com.phill.libs.GraphicsHelper;
+import com.phill.libs.ui.GraphicsHelper;
 
 
 public class DatePicker {

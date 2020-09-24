@@ -39,7 +39,7 @@ public class Recurso {
 		if (isEmpty(disciplina))
 			log("Falha ao obter nome da disciplina.");
 		else
-			this.disciplina = StringUtils.firstLetterLowerCase(disciplina).replace("questões","Questões").replace("A","a");
+			this.disciplina = StringUtils.BR.normaliza(disciplina).replace("questões","Questões").replace("A","a");
 		
 	}
 	
@@ -64,7 +64,7 @@ public class Recurso {
 		if (isEmpty(nome_interessado))
 			log("Nome do interessado é vazio");
 		else
-			this.nome_interessado = StringUtils.firstLetterLowerCase(nome_interessado);
+			this.nome_interessado = StringUtils.BR.normaliza(nome_interessado);
 		
 	}
 	

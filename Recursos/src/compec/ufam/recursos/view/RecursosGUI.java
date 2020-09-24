@@ -16,12 +16,12 @@ import javax.swing.table.TableColumnModel;
 import org.jdatepicker.impl.JDatePickerImpl;
 
 import com.phill.libs.ui.AlertDialog;
-import com.phill.libs.FileChooserHelper;
-import com.phill.libs.GraphicsHelper;
+import com.phill.libs.ui.GraphicsHelper;
 import com.phill.libs.PropertiesManager;
 import com.phill.libs.ResourceManager;
-import com.phill.libs.TableUtils;
+import com.phill.libs.files.PhillFileUtils;
 import com.phill.libs.table.JTableMouseListener;
+import com.phill.libs.table.TableUtils;
 
 import compec.ufam.recursos.DatePicker;
 import compec.ufam.recursos.ExcelReader;
@@ -146,11 +146,11 @@ public class RecursosGUI extends JFrame {
 		scrollPlanilha.setBounds(12, 22, 672, 150);
 		painelPlanilha.add(scrollPlanilha);
 		
-		Icon searchIcon = ResourceManager.getResizedIcon("icon/search-black.png",20,20);
-		Icon clearIcon  = ResourceManager.getResizedIcon("icon/clear.png",20,20);
-		Icon exitIcon   = ResourceManager.getResizedIcon("icon/exit-black.png",20,20);
-		Icon reportIcon = ResourceManager.getResizedIcon("icon/report.png",20,20);
-		Icon saveIcon   = ResourceManager.getResizedIcon("icon/save.png",20,20);
+		Icon searchIcon = ResourceManager.getIcon("icon/search-black.png",20,20);
+		Icon clearIcon  = ResourceManager.getIcon("icon/clear.png",20,20);
+		Icon exitIcon   = ResourceManager.getIcon("icon/exit-black.png",20,20);
+		Icon reportIcon = ResourceManager.getIcon("icon/report.png",20,20);
+		Icon saveIcon   = ResourceManager.getIcon("icon/save.png",20,20);
 		
 		JButton botaoSalvaConfig = new JButton(saveIcon);
 		botaoSalvaConfig.addActionListener((event) -> action_salva_config());
@@ -299,7 +299,7 @@ public class RecursosGUI extends JFrame {
 				columns[i] = modelo.getValueAt(i,2).toString();
 			
 			// Salvando configuração no arquivo de propriedades
-			PropertiesManager.setProperty(this.concursoAtual.getColumns(),columns);
+			PropertiesManager.setStringArray(this.concursoAtual.getColumns(),columns,null);
 			
 			// Alertando usuário
 			AlertDialog.info("Configuração de planilha salva com sucesso!");
@@ -326,7 +326,7 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			// Abrindo a GUI de seleção de arquivo
-			dir_destino = FileChooserHelper.loadDir(this, "Selecione a pasta de destino (PDF)", true, FileChooserHelper.HOME_DIRECTORY);
+			dir_destino = PhillFileUtils.loadDir("Selecione a pasta de destino (PDF)", PhillFileUtils.SAVE_DIALOG, null);
 			
 			// Atualizando o nome do arquivo no label de seleção
 			textDestino.setText(dir_destino.getAbsolutePath());
@@ -343,7 +343,7 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			// Abrindo a GUI de seleção de arquivo
-			dir_origem = FileChooserHelper.loadDir(this, "Selecione a pasta de origem (planilhas)", false, FileChooserHelper.HOME_DIRECTORY);
+			dir_origem = PhillFileUtils.loadDir("Selecione a pasta de origem (planilhas)", PhillFileUtils.OPEN_DIALOG, null);
 			
 			// Atualizando o nome do arquivo no label de seleção
 			textOrigem.setText(dir_origem.getAbsolutePath());
@@ -364,8 +364,8 @@ public class RecursosGUI extends JFrame {
 		this.concursoAtual = TipoConcurso.valueOf(comboConcursos.getSelectedItem().toString());
 		
 		// Recuperando as colunas e dados
-		String[] columnNames = PropertiesManager.getPropertyAsArray(this.concursoAtual.getColumnNames());
-		String[] columns     = PropertiesManager.getPropertyAsArray(this.concursoAtual.getColumns());
+		String[] columnNames = PropertiesManager.getStringArray(this.concursoAtual.getColumnNames(),null);
+		String[] columns     = PropertiesManager.getStringArray(this.concursoAtual.getColumns(),null);
 		
 		// Simples tratamento de erros
 		if (columnNames.length != columns.length) {
@@ -486,7 +486,7 @@ public class RecursosGUI extends JFrame {
 			
 			this.edital  = edital;
 			this.data    = data;
-			this.colunas = PropertiesManager.getPropertyAsArray(concursoAtual.getColumns());
+			this.colunas = PropertiesManager.getStringArray(concursoAtual.getColumns(),null);
 			
 		}
 		
