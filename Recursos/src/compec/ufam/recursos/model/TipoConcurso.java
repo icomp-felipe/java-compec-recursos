@@ -7,7 +7,8 @@ import com.phill.libs.ResourceManager;
 public enum TipoConcurso {
 	
 	PSTEC("reports/RecursosPSTEC.jasper"),
-	PSC  ("reports/RecursosPSC.jasper"  );
+	PSC  ("reports/RecursosPSC.jasper"  ),
+	PSE  ("reports/RecursosPSE.jasper"  );
 	
 	private File report;
 	private String columns, columnNames;

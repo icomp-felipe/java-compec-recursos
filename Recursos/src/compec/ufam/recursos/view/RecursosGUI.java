@@ -592,6 +592,7 @@ public class RecursosGUI extends JFrame {
 				PDFWriter.export(this.edital, this.data, concursoAtual, listaOrdenada, pdf);
 			} catch (Exception exception) {
 				System.err.println("x Falha ao gerar o PDF '" + pdf.getName() + "': " + exception.getMessage());
+				exception.printStackTrace();
 				return false;
 			}
 			
