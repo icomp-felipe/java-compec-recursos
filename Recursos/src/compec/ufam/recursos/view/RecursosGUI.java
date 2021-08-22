@@ -658,7 +658,7 @@ public class RecursosGUI extends JFrame {
 				map_cargos_sorted.forEach((key,value) -> builder.append(key.substring(0,4) + " - "));
 				
 				// Por fim, monto o nome do arquivo com os códigos e nome de cargo + tratamentos de caracteres especiais em nome de arquivo
-				String filename = String.format("%s%s (Todos).pdf",builder.toString(),listaRecursos.get(0).getCargo().substring(5).replace("/"," - ").replace(":"," "));
+				String filename = String.format("%s%s (Todos).pdf",builder.toString(),listaRecursos.get(0).getCargo().substring(7).replace("/"," - ").replace(":"," "));
 
 				return new File(dir_destino.getAbsolutePath() + "/" + filename);
 				

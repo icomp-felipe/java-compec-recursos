@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Recursos" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a916fcdd-52db-4f6d-a31d-e61807a79453">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
-	<style name="Textos Estáticos" fontSize="11" isBold="true"/>
+	<style name="Textos Estáticos" fontName="DejaVu" fontSize="11" isBold="true"/>
 	<style name="Textos Dinâmicos" fontSize="11"/>
 	<parameter name="PAR_EDITAL" class="java.lang.String"/>
 	<parameter name="PAR_LOGO" class="java.awt.image.BufferedImage"/>
@@ -34,9 +34,10 @@
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement textAlignment="Right"/>
 				<text><![CDATA[Disciplina:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement style="Textos Dinâmicos" x="0" y="235" width="555" height="20" uuid="28ca5fae-38bc-4a1c-ba27-52a6e22de93e">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
@@ -54,14 +55,14 @@
 			<staticText>
 				<reportElement x="0" y="80" width="555" height="20" uuid="b92d5db7-aae8-4cb5-948d-5e1277e0a948"/>
 				<textElement textAlignment="Center">
-					<font size="13" isBold="true"/>
+					<font fontName="DejaVu" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Resposta a Recurso contra Questão de Prova]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="0" y="104" width="555" height="16" uuid="4f878eb1-4101-400c-9199-0bc38fff753a"/>
 				<textElement textAlignment="Center">
-					<font size="11" isBold="true"/>
+					<font fontName="DejaVu" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PAR_EDITAL}]]></textFieldExpression>
 			</textField>
@@ -70,6 +71,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
+				<textElement textAlignment="Right"/>
 				<text><![CDATA[N° da Questão:]]></text>
 			</staticText>
 			<textField>
@@ -85,6 +87,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
+				<textElement textAlignment="Right"/>
 				<text><![CDATA[Interessado(a):]]></text>
 			</staticText>
 			<textField>
@@ -101,7 +104,7 @@
 				</reportElement>
 				<text><![CDATA[Parecer:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement style="Textos Dinâmicos" positionType="Float" x="0" y="285" width="555" height="20" uuid="0d92910c-0e70-4328-bcfe-341015accccc">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -131,7 +134,7 @@
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" markup="html">
-					<font size="11"/>
+					<font fontName="DejaVu" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<b>Data de Publicação:</b> " + $P{PAR_DATA_PUBLICACAO}]]></textFieldExpression>
 			</textField>
@@ -145,6 +148,7 @@
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement textAlignment="Right"/>
 				<text><![CDATA[Cargo:]]></text>
 			</staticText>
 			<textField>
@@ -153,6 +157,9 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
+				<textElement>
+					<font fontName="DejaVu"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{cargo}]]></textFieldExpression>
 			</textField>
 		</band>
