@@ -7,6 +7,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 
+import com.phill.libs.StringUtils;
+
 import compec.ufam.recursos.model.Recurso;
 
 public class ExcelReader {
@@ -60,14 +62,27 @@ public class ExcelReader {
 			return null;
 		
 		// Extração de dados das células do Excel
-		String cargo            = getCellContent(first_cell);
+		/*String cargo            = getCellContent(first_cell);
 		String nome_interessado = getCellContent(row.getCell(INDICES[1]));
 		String disciplina       = getCellContent(row.getCell(INDICES[2]));
 		String num_questao      = getCellContent(row.getCell(INDICES[3]));
 		String questionamento   = getCellContent(row.getCell(INDICES[4]));
 		String solic_alteracao  = getCellContent(row.getCell(INDICES[5]));
 		String parecer          = getCellContent(row.getCell(INDICES[6]));
-		String resposta         = getCellContent(row.getCell(INDICES[7]));
+		String resposta         = getCellContent(row.getCell(INDICES[7]));*/
+		
+		// Dedicado ao EAD
+		String num_questao = null, solic_alteracao = null, cargo = null;
+		String nome_interessado = getCellContent(first_cell);
+		String disciplina       = getCellContent(row.getCell(INDICES[1]));
+		String questionamento   = getCellContent(row.getCell(INDICES[2]));
+		String parecer          = getCellContent(row.getCell(INDICES[3]));
+		String resposta         = getCellContent(row.getCell(INDICES[4]));
+
+		String cpf   = StringUtils.extractNumbers(disciplina);
+		cpf = String.format("%011d",Long.parseLong(cpf));
+		
+		disciplina = String.format("%s*.***.***-%s", cpf.substring(0,2), cpf.substring(9));
 		
 		// String cargo            = (isPSC) ? null : getCellContent(row.getCell(INDICES[8]));
 

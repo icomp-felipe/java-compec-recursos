@@ -8,7 +8,8 @@ public enum TipoConcurso {
 	
 	PSTEC("reports/RecursosPSTEC.jasper"),
 	PSC  ("reports/RecursosPSC.jasper"  ),
-	PSE  ("reports/RecursosPSE.jasper"  );
+	PSE  ("reports/RecursosPSE.jasper"  ),
+	EAD  ("reports/RecursosEAD.jasper"  );
 	
 	private File report;
 	private String columns, columnNames;

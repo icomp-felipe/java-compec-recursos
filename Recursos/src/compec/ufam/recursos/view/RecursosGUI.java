@@ -642,6 +642,14 @@ public class RecursosGUI extends JFrame {
 				
 			}
 			
+			else if (concursoAtual == TipoConcurso.EAD) {
+				
+				String filename = String.format("%s/Recursos EAD.pdf", dir_destino.getAbsolutePath());
+				
+				return new File(filename);
+				
+			}
+			
 			// No sistema está implementado apenas o PSC e PSTEC, logo, esse bloco é para o PSTEC
 			else {
 				
