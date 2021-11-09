@@ -508,10 +508,10 @@ public class RecursosGUI extends JFrame {
 				
 				// ...vou varrendo-o...
 				for (File sub_dir: dir_origem.listFiles()) {
-						
+					
 					// ...em busca de subdiretórios acessíveis...
 					if (sub_dir.isDirectory() && sub_dir.canRead()) {
-							
+						
 						// ...e, processando estes subdiretórios
 						dir_proc++;
 						status = core_parse_dir(sub_dir);

@@ -62,34 +62,14 @@ public class ExcelReader {
 			return null;
 		
 		// Extração de dados das células do Excel
-		/*String cargo            = getCellContent(first_cell);
-		String nome_interessado = getCellContent(row.getCell(INDICES[1]));
-		String disciplina       = getCellContent(row.getCell(INDICES[2]));
-		String num_questao      = getCellContent(row.getCell(INDICES[3]));
-		String questionamento   = getCellContent(row.getCell(INDICES[4]));
-		String solic_alteracao  = getCellContent(row.getCell(INDICES[5]));
-		String parecer          = getCellContent(row.getCell(INDICES[6]));
-		String resposta         = getCellContent(row.getCell(INDICES[7]));*/
-		
-		// Dedicado ao EAD
-		String num_questao = null, solic_alteracao = null, cargo = null;
+		//String cargo            = getCellContent(first_cell);
 		String nome_interessado = getCellContent(first_cell);
 		String disciplina       = getCellContent(row.getCell(INDICES[1]));
-		String questionamento   = getCellContent(row.getCell(INDICES[2]));
-		String parecer          = getCellContent(row.getCell(INDICES[3]));
-		String resposta         = getCellContent(row.getCell(INDICES[4]));
-
-		String cpf   = StringUtils.extractNumbers(disciplina);
-		cpf = String.format("%011d",Long.parseLong(cpf));
-		
-		disciplina = String.format("%s*.***.***-%s", cpf.substring(0,2), cpf.substring(9));
-		
-		// String cargo            = (isPSC) ? null : getCellContent(row.getCell(INDICES[8]));
-
-		/**
-		 * D;B;C;E;F;G;H;I;
-           Cargo;Nome do Interessado;Disciplina;N\u00FAmero da Quest\u00E3o;Questionamento (Candidato);Altera\u00E7\u00E3o (Candidato);Parecer (Banca);Resposta (Banca);
-		 * */
+		String num_questao      = getCellContent(row.getCell(INDICES[2]));
+		String questionamento   = getCellContent(row.getCell(INDICES[3]));
+		String solic_alteracao  = getCellContent(row.getCell(INDICES[4]));
+		String parecer          = getCellContent(row.getCell(INDICES[5]));
+		String resposta         = getCellContent(row.getCell(INDICES[6]));
 		
 		// Alimentando uma nova classe 'Recurso'
 		Recurso recurso = new Recurso(row.getRowNum(),planilha);
@@ -101,7 +81,6 @@ public class ExcelReader {
 		recurso.setAlteracao(solic_alteracao);
 		recurso.setParecer(parecer);
 		recurso.setResposta(resposta);
-		recurso.setCargo(cargo);
 		
 		return recurso;
 	}
