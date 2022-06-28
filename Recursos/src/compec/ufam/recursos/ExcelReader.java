@@ -62,18 +62,19 @@ public class ExcelReader {
 			return null;
 		
 		// Extração de dados das células do Excel
-		//String cargo            = getCellContent(first_cell);
-		String nome_interessado = getCellContent(first_cell);
-		String disciplina       = getCellContent(row.getCell(INDICES[1]));
-		String num_questao      = getCellContent(row.getCell(INDICES[2]));
-		String questionamento   = getCellContent(row.getCell(INDICES[3]));
-		String solic_alteracao  = getCellContent(row.getCell(INDICES[4]));
-		String parecer          = getCellContent(row.getCell(INDICES[5]));
-		String resposta         = getCellContent(row.getCell(INDICES[6]));
+		String cargo            = getCellContent(first_cell);
+		String nome_interessado = getCellContent(row.getCell(INDICES[1]));
+		String disciplina       = getCellContent(row.getCell(INDICES[2]));
+		String num_questao      = getCellContent(row.getCell(INDICES[3]));
+		String questionamento   = getCellContent(row.getCell(INDICES[4]));
+		String solic_alteracao  = getCellContent(row.getCell(INDICES[5]));
+		String parecer          = getCellContent(row.getCell(INDICES[6]));
+		String resposta         = getCellContent(row.getCell(INDICES[7]));
 		
 		// Alimentando uma nova classe 'Recurso'
 		Recurso recurso = new Recurso(row.getRowNum(),planilha);
 		
+		recurso.setCargo(cargo);
 		recurso.setNomeInteressado(nome_interessado);
 		recurso.setDisciplina(disciplina);
 		recurso.setNumQuestao(num_questao);
