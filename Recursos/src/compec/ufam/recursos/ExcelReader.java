@@ -7,8 +7,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 
-import com.phill.libs.StringUtils;
-
 import compec.ufam.recursos.model.Recurso;
 
 public class ExcelReader {
