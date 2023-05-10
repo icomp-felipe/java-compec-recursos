@@ -2,6 +2,7 @@ package compec.ufam.recursos.view;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -250,7 +251,7 @@ public class RecursosGUI extends JFrame {
 	/** Limpa os dados da tela */
 	private void action_clear() {
 		
-		int res  = AlertDialog.dialog("Você tem certeza que deseja limpar os dados da tela?");
+		int res  = AlertDialog.dialog(this, "Você tem certeza que deseja limpar os dados da tela?");
 		if (res != AlertDialog.OK_OPTION)
 			return;
 		
@@ -276,9 +277,16 @@ public class RecursosGUI extends JFrame {
 		// Se os dados da tela são válidos, inicio os trabalhos
 		if (util_parse_view(edital,data)) {
 			
-			this.threadReports = new ReportGenerator(edital,data);
-			this.threadReports.setName("Thread de geração de relatórios");
-			this.threadReports.start();
+			try {
+				
+				this.threadReports = new ReportGenerator(edital,data);
+				this.threadReports.setName("Thread de geração de relatórios");
+				this.threadReports.start();
+				
+			}
+			catch (Exception exception) {
+				exception.printStackTrace();
+			}
 			
 		}
 		
@@ -302,13 +310,13 @@ public class RecursosGUI extends JFrame {
 			PropertiesManager.setStringArray(this.concursoAtual.getColumns(),columns,null);
 			
 			// Alertando usuário
-			AlertDialog.info("Configuração de planilha salva com sucesso!");
+			AlertDialog.info(this, "Configuração de planilha salva com sucesso!");
 		
 		}
 		catch (Exception exception) {
 			
 			exception.printStackTrace();
-			AlertDialog.error("Salvando configuração","Houve algum erro durante o salvamento de configuração.\nFavor consultar o console para mais infos.");
+			AlertDialog.error(this, "Salvando configuração","Houve algum erro durante o salvamento de configuração.\nFavor consultar o console para mais infos.");
 			
 		}
 		finally {
@@ -326,14 +334,14 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			// Abrindo a GUI de seleção de arquivo
-			dir_destino = PhillFileUtils.loadDir("Selecione a pasta de destino (PDF)", PhillFileUtils.SAVE_DIALOG, null);
+			dir_destino = PhillFileUtils.loadDir(this, "Selecione a pasta de destino (PDF)", PhillFileUtils.SAVE_DIALOG, null);
 			
 			// Atualizando o nome do arquivo no label de seleção
 			textDestino.setText(dir_destino.getAbsolutePath());
 			
 		}
 		catch (NullPointerException exception) { }
-		catch (Exception exception) { AlertDialog.error("Não foi possível carregar o diretório"); }
+		catch (Exception exception) { AlertDialog.error(this, "Não foi possível carregar o diretório"); }
 		
 	}
 	
@@ -343,7 +351,7 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			// Abrindo a GUI de seleção de arquivo
-			dir_origem = PhillFileUtils.loadDir("Selecione a pasta de origem (planilhas)", PhillFileUtils.OPEN_DIALOG, null);
+			dir_origem = PhillFileUtils.loadDir(this, "Selecione a pasta de origem (planilhas)", PhillFileUtils.OPEN_DIALOG, null);
 			
 			// Atualizando o nome do arquivo no label de seleção
 			textOrigem.setText(dir_origem.getAbsolutePath());
@@ -353,7 +361,7 @@ public class RecursosGUI extends JFrame {
 			
 		}
 		catch (NullPointerException exception) { }
-		catch (Exception exception) { AlertDialog.error("Não foi possível carregar o diretório"); }
+		catch (Exception exception) { AlertDialog.error(this, "Não foi possível carregar o diretório"); }
 		
 	}
 	
@@ -363,27 +371,37 @@ public class RecursosGUI extends JFrame {
 		// Recuperando o concurso selecionado
 		this.concursoAtual = TipoConcurso.valueOf(comboConcursos.getSelectedItem().toString());
 		
-		// Recuperando as colunas e dados
-		String[] columnNames = PropertiesManager.getStringArray(this.concursoAtual.getColumnNames(),null);
-		String[] columns     = PropertiesManager.getStringArray(this.concursoAtual.getColumns(),null);
-		
-		// Simples tratamento de erros
-		if (columnNames.length != columns.length) {
+		try {
 			
-			AlertDialog.error("Configuração de Planilhas","Configuração inválida, favor conferir arquivo de propriedades");
-			return;
+			// Recuperando as colunas e dados
+			String[] columnNames = PropertiesManager.getStringArray(this.concursoAtual.getColumnNames(),null);
+			String[] columns     = PropertiesManager.getStringArray(this.concursoAtual.getColumns(),null);
+			
+			// Simples tratamento de erros
+			if (columnNames.length != columns.length) {
+				
+				AlertDialog.error(this, "Configuração de Planilhas","Configuração inválida, favor conferir arquivo de propriedades");
+				return;
+				
+			}
+			
+			// Limpa os dados da tabela
+			TableUtils.clear(modelo);
+			
+			// Preenche a tabela com os dados carregados do arquivo de propriedades
+			for (int i=0; i<columns.length; i++)
+				modelo.addRow(new Object[]{ i+1, columnNames[i], columns[i] });		// | # | Item | Coluna |
 			
 		}
-		
-		// Limpa os dados da tabela
-		TableUtils.clear(modelo);
-		
-		// Preenche a tabela com os dados carregados do arquivo de propriedades
-		for (int i=0; i<columns.length; i++)
-			modelo.addRow(new Object[]{ i+1, columnNames[i], columns[i] });		// | # | Item | Coluna |
-		
-		// Atualizando a quantidade de itens carregados
-		TableUtils.updateSize(modelo,textItens);
+		catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		finally {
+			
+			// Atualizando a quantidade de itens carregados
+			TableUtils.updateSize(modelo,textItens);
+			
+		}
 		
 	}
 	
@@ -444,26 +462,26 @@ public class RecursosGUI extends JFrame {
 	private boolean util_parse_view(String edital, String data) {
 		
 		if (edital.equals("")) {
-			AlertDialog.error("Preencha o nome do edital");
+			AlertDialog.error(this, "Preencha o nome do edital");
 			return false;
 		}
 		
 		if (data.equals("")) {
-			AlertDialog.error("Selecione uma data");
+			AlertDialog.error(this, "Selecione uma data");
 			return false;
 		}
 		
 		if (dir_origem == null) {
-			AlertDialog.error("Selecione a pasta de origem");
+			AlertDialog.error(this, "Selecione a pasta de origem");
 			return false;
 		}
 		
 		if (dir_destino == null) {
-			AlertDialog.error("Selecione a pasta de destino");
+			AlertDialog.error(this, "Selecione a pasta de destino");
 			return false;
 		}
 		
-		if (AlertDialog.dialog("Deseja mesmo continuar com o processamento?") != AlertDialog.OK_OPTION)
+		if (AlertDialog.dialog(this, "Deseja mesmo continuar com o processamento?") != AlertDialog.OK_OPTION)
 			return false;
 		
 		return true;
@@ -482,7 +500,7 @@ public class RecursosGUI extends JFrame {
 		private final String edital, data;
 		private final String[] colunas;
 		
-		public ReportGenerator(String edital, String data) {
+		public ReportGenerator(String edital, String data) throws IOException {
 			
 			this.edital  = edital;
 			this.data    = data;
