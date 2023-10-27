@@ -3,6 +3,8 @@ package compec.ufam.recursos.view;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +35,9 @@ import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.model.TipoConcurso;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /** Implementa a interface gráfica do sistema.
  *  @author Felipe André - felipeandre.eng@gmail.com
  *  @version 3.0, 27/OUT/2023 */
@@ -42,19 +47,22 @@ public class RecursosGUI extends JFrame {
 	private static final long serialVersionUID = 6968825769983359575L;
 
 	// Declaração de atributos gráficos
-	private final JTextField textEdital;
+	private final JTextField textEdital, textDestino, textOrigem;
 	private final DatePicker datePicker;
-	private final JComboBox<String> comboConcursos;
+	private final JComboBox<String> comboTipo;
 	private final JTable tablePlanilha;
-    private final DefaultTableModel modelo;
-	private final JLabel textItens, textDestino, textOrigem, textOBS, labelLoading;
-	private final JButton buttonOrigem, buttonDestino, buttonLimpar, buttonProcessar;
+    private final DefaultTableModel modelPlanilha;
+    private final JLabel labelInfo;
+    private final JTextArea textConsole;
+	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonProcessar;
 	
 	// Declaração de atributos dinâmicos
+	private File sourceDir, targetDir;
+	
+	
+	
 	private int dir_proc, fil_proc;
-	private int dir_tot, fil_tot;
-	private File dir_origem, dir_destino;
-    private String[] colunas = new String [] {"#","Item","Coluna"};
+	
 	private ReportGenerator threadReports;
     private TipoConcurso concursoAtual;
 	
@@ -74,66 +82,89 @@ public class RecursosGUI extends JFrame {
 		getContentPane().setLayout(null);
 		
 		// Recuperando ícones
-		Icon searchIcon = ResourceManager.getIcon("icon/search-black.png",20,20);
-		Icon clearIcon  = ResourceManager.getIcon("icon/clear.png",20,20);
-		Icon reportIcon = ResourceManager.getIcon("icon/report.png",20,20);
-		Icon saveIcon   = ResourceManager.getIcon("icon/save.png",20,20);
+		Icon searchIcon = ResourceManager.getIcon("icon/search.png"   , 20, 20);
+		Icon clearIcon  = ResourceManager.getIcon("icon/trash.png"    , 20, 20);
+		Icon reportIcon = ResourceManager.getIcon("icon/doc_empty.png", 20, 20);
+		Icon saveIcon   = ResourceManager.getIcon("icon/save.png"     , 20, 20);
+		Icon loading = new ImageIcon(ResourceManager.getResource("icon/loading.gif"));
 		
 		// Recuperando fontes e cores
-		Font  fonte = instance.getFont ();
-		Color color = instance.getColor();
+		Font  fonte  = instance.getFont ();
+		Font  ubuntu = instance.getUbuntuFont();
+		Color color  = instance.getColor();
 		
-		JPanel painelID = new JPanel();
-		painelID.setBorder(instance.getTitledBorder("Identificação do Concurso"));
-		painelID.setBounds(12, 10, 695, 105);
-		getContentPane().add(painelID);
-		painelID.setLayout(null);
+		// Painel 'Concurso'
+		JPanel panelConcurso = new JPanel();
+		panelConcurso.setBorder(instance.getTitledBorder("Concurso"));
+		panelConcurso.setBounds(10, 10, 780, 105);
+		panelConcurso.setLayout(null);
+		getContentPane().add(panelConcurso);
 		
 		JLabel labelEdital = new JLabel("Edital:");
+		labelEdital.setHorizontalAlignment(JLabel.RIGHT);
 		labelEdital.setFont(fonte);
-		labelEdital.setBounds(12, 35, 60, 20);
-		painelID.add(labelEdital);
+		labelEdital.setBounds(10, 30, 50, 20);
+		panelConcurso.add(labelEdital);
 		
 		textEdital = new JTextField();
 		textEdital.setToolTipText(bundle.getString("hint-text-edital"));
 		textEdital.setFont(fonte);
 		textEdital.setForeground(color);
-		textEdital.setBounds(69, 33, 615, 25);
-		painelID.add(textEdital);
-		textEdital.setColumns(10);
+		textEdital.setBounds(65, 30, 660, 25);
+		panelConcurso.add(textEdital);
 		
-		JLabel labelData = new JLabel("Data de Publicação dos Recursos:");
+		buttonEditalLimpa = new JButton(clearIcon);
+		buttonEditalLimpa.setToolTipText(bundle.getString("hint-button-edlimpa"));
+		buttonEditalLimpa.addActionListener((event) -> { textEdital.setText(null); textEdital.requestFocus(); } );
+		buttonEditalLimpa.setBounds(735, 30, 30, 25);
+		panelConcurso.add(buttonEditalLimpa);
+		
+		JLabel labelTipo = new JLabel("Tipo:");
+		labelTipo.setHorizontalAlignment(JLabel.RIGHT);
+		labelTipo.setFont(fonte);
+		labelTipo.setBounds(10, 65, 50, 20);
+		panelConcurso.add(labelTipo);
+		
+		comboTipo = new JComboBox<String>();
+		comboTipo.addActionListener((event) -> action_update_table());
+		comboTipo.setToolTipText(bundle.getString("hint-combo-tipo"));
+		comboTipo.setForeground(color);
+		comboTipo.setFont(fonte);
+		comboTipo.setBounds(65, 65, 125, 24);
+		panelConcurso.add(comboTipo);
+		
+		JLabel labelData = new JLabel("Data de Publicação:");
+		labelData.setHorizontalAlignment(JLabel.RIGHT);
 		labelData.setFont(fonte);
-		labelData.setBounds(12, 70, 262, 20);
-		painelID.add(labelData);
+		labelData.setBounds(205, 68, 140, 20);
+		panelConcurso.add(labelData);
 		
 		datePicker = LGoodDatePickerUtils.getDatePicker();
+		datePicker.getComponentDateTextField().setToolTipText(bundle.getString("hint-datepicker"));
 		datePicker.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
-		datePicker.setBounds(265, 70, 145, 30);
-		painelID.add(datePicker);
+		datePicker.setBounds(350, 65, 145, 30);
+		panelConcurso.add(datePicker);
 		
-		/*data_realizacao = DatePicker.getDatePicker();
-		data_realizacao.setBounds(265, 70, 140, 25);
-		painelID.add(data_realizacao);*/
+		// Painel 'Planilhas de Entrada'
+		JPanel panelPlanilha = new JPanel();
+		panelPlanilha.setBorder(instance.getTitledBorder("Planilhas de Entrada"));
+		panelPlanilha.setBounds(10, 115, 780, 220);
+		panelPlanilha.setLayout(null);
+		getContentPane().add(panelPlanilha);
 		
-		JLabel labelTipoConcurso = new JLabel("Tipo de Concurso:");
-		labelTipoConcurso.setFont(fonte);
-		labelTipoConcurso.setBounds(420, 70, 131, 20);
-		painelID.add(labelTipoConcurso);
+		JScrollPane scrollPlanilha = new JScrollPane();
+		scrollPlanilha.setBounds(10, 25, 760, 186);
+		panelPlanilha.add(scrollPlanilha);
 		
-		comboConcursos = new JComboBox<String>();
-		comboConcursos.addActionListener((event) -> action_update_table());
-		comboConcursos.setForeground(color);
-		comboConcursos.setFont(fonte);
-		comboConcursos.setBounds(559, 68, 125, 24);
-		painelID.add(comboConcursos);
+		modelPlanilha = new MyTableModel(new String [] {"#","Item","Coluna"});
 		
-		modelo  = new MyTableModel(colunas);
-		
-		tablePlanilha = new JTable(modelo);
-		tablePlanilha.setOpaque(false);
+		tablePlanilha = new JTable(modelPlanilha);
+		tablePlanilha.setRowHeight(20);
+		tablePlanilha.setFont(ubuntu);
+		tablePlanilha.getTableHeader().setFont(fonte);
 		tablePlanilha.addMouseListener(new JTableMouseListener(tablePlanilha));
 		tablePlanilha.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scrollPlanilha.setViewportView(tablePlanilha);
 		
 		final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -143,133 +174,181 @@ public class RecursosGUI extends JFrame {
 		columnModel.getColumn(0).setCellRenderer(centerRenderer);
 		columnModel.getColumn(2).setCellRenderer(centerRenderer);
 		
-		columnModel.getColumn(0).setPreferredWidth(5);
-		columnModel.getColumn(1).setPreferredWidth(400);
+		columnModel.getColumn(0).setPreferredWidth( 15);
+		columnModel.getColumn(1).setPreferredWidth(597);
+		columnModel.getColumn(2).setPreferredWidth( 36);
 		
-		JPanel painelPlanilha = new JPanel();
-		painelPlanilha.setBorder(instance.getTitledBorder("Configuração da Planilha"));
-		painelPlanilha.setBounds(12, 120, 695, 220);
-		getContentPane().add(painelPlanilha);
-		painelPlanilha.setLayout(null);
-		
-		JScrollPane scrollPlanilha = new JScrollPane(tablePlanilha);
-		scrollPlanilha.setBounds(12, 22, 672, 150);
-		painelPlanilha.add(scrollPlanilha);
-		
-
-		
-		JButton botaoSalvaConfig = new JButton(saveIcon);
-		botaoSalvaConfig.addActionListener((event) -> action_salva_config());
-		
-		JLabel labelItens = new JLabel("Quantidade de Itens:");
-		labelItens.setFont(fonte);
-		labelItens.setBounds(12, 190, 150, 20);
-		painelPlanilha.add(labelItens);
-		
-		textItens = new JLabel("0");
-		textItens.setForeground(color);
-		textItens.setFont(fonte);
-		textItens.setBounds(167, 189, 70, 20);
-		painelPlanilha.add(textItens);
-		botaoSalvaConfig.setToolTipText("Salvar configuração");
-		botaoSalvaConfig.setBounds(653, 184, 30, 25);
-		painelPlanilha.add(botaoSalvaConfig);
-		
-		JPanel painelPastas = new JPanel();
-		painelPastas.setBorder(instance.getTitledBorder("Pastas"));
-		painelPastas.setBounds(12, 352, 696, 105);
-		getContentPane().add(painelPastas);
-		painelPastas.setLayout(null);
+		// Painel 'Pastas'		
+		JPanel panelPastas = new JPanel();
+		panelPastas.setBorder(instance.getTitledBorder("Pastas"));
+		panelPastas.setBounds(10, 335, 780, 105);
+		panelPastas.setLayout(null);
+		getContentPane().add(panelPastas);
 		
 		JLabel labelOrigem = new JLabel("Origem (Planilhas):");
+		labelOrigem.setHorizontalAlignment(JLabel.RIGHT);
 		labelOrigem.setFont(fonte);
-		labelOrigem.setBounds(12, 35, 140, 20);
-		painelPastas.add(labelOrigem);
+		labelOrigem.setBounds(10, 30, 140, 20);
+		panelPastas.add(labelOrigem);
 		
-		textOrigem = new JLabel("<Selecionar Arquivo>");
+		textOrigem = new JTextField();
 		textOrigem.setFont(fonte);
 		textOrigem.setForeground(color);
-		textOrigem.setBounds(164, 35, 475, 20);
-		painelPastas.add(textOrigem);
+		textOrigem.setEditable(false);
+		textOrigem.setToolTipText(bundle.getString("hint-text-origem"));
+		textOrigem.setBounds(155, 30, 570, 25);
+		panelPastas.add(textOrigem);
 		
 		buttonOrigem = new JButton(searchIcon);
-		buttonOrigem.setToolTipText("Selecionar a pasta de origem (planilhas)");
-		buttonOrigem.addActionListener((event) -> action_seleciona_origem());
-		buttonOrigem.setBounds(650, 32, 30, 25);
-		painelPastas.add(buttonOrigem);
+		buttonOrigem.setToolTipText(bundle.getString("hint-button-origem"));
+		buttonOrigem.addActionListener((event) -> actionSelectOrigem());
+		buttonOrigem.setBounds(735, 30, 30, 25);
+		panelPastas.add(buttonOrigem);
 		
 		JLabel labelDestino = new JLabel("Destino (PDF):");
+		labelDestino.setHorizontalAlignment(JLabel.RIGHT);
 		labelDestino.setFont(fonte);
-		labelDestino.setBounds(12, 65, 140, 20);
-		painelPastas.add(labelDestino);
+		labelDestino.setBounds(10, 65, 140, 20);
+		panelPastas.add(labelDestino);
 		
-		textDestino = new JLabel("<Selecionar Arquivo>");
+		textDestino = new JTextField();
 		textDestino.setForeground(color);
 		textDestino.setFont(fonte);
-		textDestino.setBounds(164, 65, 473, 20);
-		painelPastas.add(textDestino);
+		textDestino.setEditable(false);
+		textDestino.setToolTipText(bundle.getString("hint-text-destino"));
+		textDestino.setBounds(155, 65, 570, 25);
+		panelPastas.add(textDestino);
 		
 		buttonDestino = new JButton(searchIcon);
-		buttonDestino.setToolTipText("Selecionar a pasta de destino (PDF)");
-		buttonDestino.addActionListener((event) -> action_seleciona_destino());
-		buttonDestino.setBounds(650, 63, 30, 25);
-		painelPastas.add(buttonDestino);
+		buttonDestino.setToolTipText(bundle.getString("hint-button-destino"));
+		buttonDestino.addActionListener((event) -> actionSelectDestino());
+		buttonDestino.setBounds(735, 65, 30, 25);
+		panelPastas.add(buttonDestino);
 		
-		ImageIcon loading = new ImageIcon(ResourceManager.getResource("img/ajax-loader.gif"));
+		// Painel 'Console'
+		JPanel panelConsole = new JPanel();
+		panelConsole.setBorder(instance.getTitledBorder("Console"));
+		panelConsole.setBounds(10, 440, 780, 231);
+		panelConsole.setLayout(null);
+		getContentPane().add(panelConsole);
 		
-		textOBS = new JLabel();
-		textOBS.setFont(fonte);
-		textOBS.setForeground(color);
-		textOBS.setBounds(44, 464, 528, 44);
-		textOBS.setVisible(false);
-		getContentPane().add(textOBS);
+		JScrollPane scrollConsole = new JScrollPane();
+		scrollConsole.setBounds(10, 25, 760, 194);
+		panelConsole.add(scrollConsole);
 		
-		labelLoading = new JLabel(loading,SwingConstants.LEFT);
-		labelLoading.setBounds(12, 464, 20, 35);
-		labelLoading.setVisible(false);
-		getContentPane().add(labelLoading);
+		textConsole = new JTextArea();
+		textConsole.setFont(fonte);
+		textConsole.setEditable(false);
+		textConsole.setToolTipText(bundle.getString("hint-text-console"));
+		scrollConsole.setViewportView(textConsole);
 		
-		buttonLimpar = new JButton(clearIcon);
-		buttonLimpar.setToolTipText("Limpar os dados da tela");
-		buttonLimpar.addActionListener((event) -> action_clear());
-		buttonLimpar.setBounds(678, 474, 30, 25);
-		getContentPane().add(buttonLimpar);
+		// Fundo da janela
+		labelInfo = new JLabel(loading);
+		labelInfo.setFont(fonte);
+		labelInfo.setVisible(false);
+		labelInfo.setText("Em processamento...");
+		labelInfo.setBounds(10, 685, 170, 20);
+		getContentPane().add(labelInfo);
 		
 		buttonProcessar = new JButton(reportIcon);
 		buttonProcessar.setToolTipText("Gerar os recursos em PDF");
 		buttonProcessar.addActionListener((event) -> action_proccess());
-		buttonProcessar.setBounds(600, 474, 30, 25);
+		buttonProcessar.setBounds(760, 683, 30, 25);
 		getContentPane().add(buttonProcessar);
+		
 		
 		init_load_combo();
 		
-		setSize(720,545);
+		setSize(800, 720);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
-		getContentPane().setLayout(null);
 		setVisible(true);
 		
 	}
 	
-	/** Limpa os dados da tela */
-	private void action_clear() {
+	/******************** Bloco de Tratamento de Eventos de Botões *************************/
+	
+	/** Seleciona o diretório de destino das respostas aos recursos. */
+	private void actionSelectDestino() {
 		
-		int res  = AlertDialog.dialog(this, "Você tem certeza que deseja limpar os dados da tela?");
-		if (res != AlertDialog.OK_OPTION)
-			return;
+		File destino = PhillFileUtils.loadDir(this, "Recursys v.3.0 - Selecione a pasta de destino (PDF)", PhillFileUtils.SAVE_DIALOG, null);
 		
-		textEdital.setText(null);
-		//data_realizacao.getJFormattedTextField().setText(null);
-		
-		textOrigem.setText("<Selecionar Arquivo>");
-		textDestino.setText("<Selecionar Arquivo>");
-		dir_origem = dir_destino = null;
-		
-		textOBS.setVisible(false);
+		if (destino != null) {
+			
+			textDestino.setText(destino.getAbsolutePath()); this.targetDir = destino;
+			
+			if (!destino.canWrite())
+				warning("Não é possível criar arquivos na pasta de destino '%s'", destino.getAbsolutePath());
+			
+		}
 		
 	}
 	
+	/** Seleciona o diretório de origem e busca por planilhas em seus subdiretórios. */
+	private void actionSelectOrigem() {
+		
+		File origem = PhillFileUtils.loadDir(this, "Recursys v.3.0 - Selecione a pasta de origem (planilhas)", PhillFileUtils.OPEN_DIALOG, null);
+		
+		if (origem != null) {
+			
+			textOrigem.setText(origem.getAbsolutePath()); this.sourceDir = origem;
+			
+			Thread explorer = new Thread(() -> threadExplorer());
+			explorer.setName("Thread exploradora de diretório de origem");
+			explorer.start();
+			
+		}
+		
+	}
+	
+	/*************************** Bloco de Métodos em Thread ********************************/
+	
+	/** Analisa o diretório de origem de planilhas */
+	private void threadExplorer() {
+		
+		try {
+			
+			labelInfo.setVisible(true);
+			
+			// Contando quantas planilhas existem no diretório (e subs)
+			final int planilhas = (int) Files.walk(sourceDir.toPath())
+					                         .parallel()
+					                         .filter(p -> p.toFile().isFile() && p.toFile().getName().endsWith("xlsx") )
+					                         .count();
+			
+			// Atualizando a UI
+			switch (planilhas) {
+			
+				case 0:
+					log("Nenhuma planilha encontrada em '%s'", sourceDir.getAbsolutePath());
+					break;
+					
+				case 1:
+					log("Encontrada 1 planilha em '%s'", sourceDir.getAbsolutePath());
+					break;
+				
+				default:
+					log("Encontradas %d planilhas em '%s'", planilhas, sourceDir.getAbsolutePath());
+					break;
+			
+			}
+			
+			
+		}
+		catch (Exception exception) {
+			
+			error("Falha ao varrer os arquivos em '%s'. Verifique o console para mais informações.", sourceDir.getAbsolutePath());
+			exception.printStackTrace();
+			
+		}
+		finally {
+			
+			labelInfo.setVisible(false);
+			
+		}
+		
+	}
 
 	/** Valida os dados da tela e, se tudo estiver certo, inicia a geração de relatórios */
 	private void action_proccess() {
@@ -300,7 +379,7 @@ public class RecursosGUI extends JFrame {
 	private void action_salva_config() {
 
 		// Configurando as variáveis
-		final int rows = modelo.getRowCount();
+		final int rows = modelPlanilha.getRowCount();
 		
 		try {
 		
@@ -308,7 +387,7 @@ public class RecursosGUI extends JFrame {
 			
 			// Varre todas as linhas da tabela recuperando as colunas configuradas
 			for (int i=0; i<rows; i++)
-				columns[i] = modelo.getValueAt(i,2).toString();
+				columns[i] = modelPlanilha.getValueAt(i,2).toString();
 			
 			// Salvando configuração no arquivo de propriedades
 			PropertiesManager.setStringArray(this.concursoAtual.getColumns(),columns,null);
@@ -332,48 +411,13 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-	/** Seleciona o diretório de destino */
-	private void action_seleciona_destino() {
-		
-		try {
-			
-			// Abrindo a GUI de seleção de arquivo
-			dir_destino = PhillFileUtils.loadDir(this, "Selecione a pasta de destino (PDF)", PhillFileUtils.SAVE_DIALOG, null);
-			
-			// Atualizando o nome do arquivo no label de seleção
-			textDestino.setText(dir_destino.getAbsolutePath());
-			
-		}
-		catch (NullPointerException exception) { }
-		catch (Exception exception) { AlertDialog.error(this, "Não foi possível carregar o diretório"); }
-		
-	}
-	
-	/** Seleciona o diretório de origem */
-	private void action_seleciona_origem() {
-		
-		try {
-			
-			// Abrindo a GUI de seleção de arquivo
-			dir_origem = PhillFileUtils.loadDir(this, "Selecione a pasta de origem (planilhas)", PhillFileUtils.OPEN_DIALOG, null);
-			
-			// Atualizando o nome do arquivo no label de seleção
-			textOrigem.setText(dir_origem.getAbsolutePath());
-			
-			// Carrega o diretório informado e exibe algumas estatísticas
-			new Thread(() -> util_parse_dir()).start();
-			
-		}
-		catch (NullPointerException exception) { }
-		catch (Exception exception) { AlertDialog.error(this, "Não foi possível carregar o diretório"); }
-		
-	}
+
 	
 	/** Atualiza a tabela com as configurações do arquivo de propriedades */
 	private void action_update_table() {
 
 		// Recuperando o concurso selecionado
-		this.concursoAtual = TipoConcurso.valueOf(comboConcursos.getSelectedItem().toString());
+		this.concursoAtual = TipoConcurso.valueOf(comboTipo.getSelectedItem().toString());
 		
 		try {
 			
@@ -390,11 +434,11 @@ public class RecursosGUI extends JFrame {
 			}
 			
 			// Limpa os dados da tabela
-			TableUtils.clear(modelo);
+			TableUtils.clear(modelPlanilha);
 			
 			// Preenche a tabela com os dados carregados do arquivo de propriedades
 			for (int i=0; i<columns.length; i++)
-				modelo.addRow(new Object[]{ i+1, columnNames[i], columns[i] });		// | # | Item | Coluna |
+				modelPlanilha.addRow(new Object[]{ i+1, columnNames[i], columns[i] });		// | # | Item | Coluna |
 			
 		}
 		catch (Exception exception) {
@@ -403,7 +447,6 @@ public class RecursosGUI extends JFrame {
 		finally {
 			
 			// Atualizando a quantidade de itens carregados
-			TableUtils.updateSize(modelo,textItens);
 			
 		}
 		
@@ -413,52 +456,26 @@ public class RecursosGUI extends JFrame {
 	private void init_load_combo() {
 		
 		for (TipoConcurso concurso: TipoConcurso.values())
-			comboConcursos.addItem(concurso.name());
+			comboTipo.addItem(concurso.name());
 		
 	}
 
-	/** Analisa o diretório de origem de planilhas */
-	private void util_parse_dir() {
+	
+	private void log(final String format, final Object... args) {
 		
-		// Zerando os contadores
-		this.dir_tot = this.fil_tot = 0;
+		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[INFO] " + format + "\n", args)));
 		
-		// Se o diretório de origem for legível...
-		if (dir_origem.canRead()) {
-			
-			// ...vou atualizando a view e...
-			SwingUtilities.invokeLater(() -> {
-												labelLoading.setVisible(true);
-												textOBS.setVisible(true);
-												textOBS.setText("Lendo diretório");
-											 });
-			
-			// ...varrendo os subdiretórios em busca de planilhas
-			for (File sub_dir: dir_origem.listFiles()) {
-				
-				if (sub_dir.isDirectory() && sub_dir.canRead()) {
-					
-					this.dir_tot++;
-					
-					for (File sub_file: sub_dir.listFiles()) {
-						
-						if (sub_file.isFile() && sub_file.getName().endsWith(".xlsx"))
-							this.fil_tot++;
-						
-					}
-					
-				}
-				
-			}
-			
-		}
+	}
+	
+	private void warning(final String format, final Object... args) {
 		
-		// Por fim, atualizo a view com as informações encontradas
-		String obs = String.format("Encontrada(s) %d planilha(s) em %d pasta(s)",this.fil_tot,this.dir_tot);
-		SwingUtilities.invokeLater(() -> {
-											textOBS.setText(obs);
-											labelLoading.setVisible(false);
-									     });
+		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[ATENÇÃO] " + format + "\n", args)));
+		
+	}
+	
+	private void error(final String format, final Object... args) {
+		
+		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[ERRO] " + format + "\n", args)));
 		
 	}
 	
@@ -475,12 +492,12 @@ public class RecursosGUI extends JFrame {
 			return false;
 		}
 		
-		if (dir_origem == null) {
+		if (sourceDir == null) {
 			AlertDialog.error(this, "Selecione a pasta de origem");
 			return false;
 		}
 		
-		if (dir_destino == null) {
+		if (targetDir == null) {
 			AlertDialog.error(this, "Selecione a pasta de destino");
 			return false;
 		}
@@ -523,13 +540,13 @@ public class RecursosGUI extends JFrame {
 			dir_proc = fil_proc = 0;
 			
 			// Atualizando a view
-			SwingUtilities.invokeLater(() -> labelLoading.setVisible(true));
+			//SwingUtilities.invokeLater(() -> labelLoading.setVisible(true));
 			
 			// Se o diretório de origem for legível...
-			if (dir_origem.canRead()) {
+			if (sourceDir.canRead()) {
 				
 				// ...vou varrendo-o...
-				for (File sub_dir: dir_origem.listFiles()) {
+				for (File sub_dir: sourceDir.listFiles()) {
 					
 					// ...em busca de subdiretórios acessíveis...
 					if (sub_dir.isDirectory() && sub_dir.canRead()) {
@@ -549,8 +566,8 @@ public class RecursosGUI extends JFrame {
 			// Atualizando a view
 			String message = (success) ? "Tudo completo!" : "Terminado, mas com algumas falhas (vide console).";
 			SwingUtilities.invokeLater(() -> {
-												labelLoading.setVisible(false);
-												textOBS.setText(message);
+												//labelLoading.setVisible(false);
+												//textOBS.setText(message);
 												util_lock_fields(false);
 											 });
 			
@@ -592,7 +609,7 @@ public class RecursosGUI extends JFrame {
 			/********************* Ordenação das Listas *************************/
 			
 			// Atualizando a GUI
-			SwingUtilities.invokeLater(() -> textOBS.setText("Ordenando recursos"));
+			//SwingUtilities.invokeLater(() -> textOBS.setText("Ordenando recursos"));
 			
 			ArrayList<Recurso> listaOrdenada = ListSorter.sort(listaRecursos);
 			
@@ -607,7 +624,7 @@ public class RecursosGUI extends JFrame {
 			File pdf = util_pdf_filename(listaOrdenada);
 			
 			// Atualizando a GUI
-			SwingUtilities.invokeLater(() -> textOBS.setText("Gerando PDF '" + pdf.getName() + "'"));
+			//SwingUtilities.invokeLater(() -> textOBS.setText("Gerando PDF '" + pdf.getName() + "'"));
 			
 			// Exportando o PDF
 			try {
@@ -624,8 +641,8 @@ public class RecursosGUI extends JFrame {
 		/** Formatando string de log (view) */
 		private void util_obs_reading(File dir, File sheet) {
 			
-			String message = String.format("<html>Processando pasta %d de %d (%s)...<br>Lendo planilha %d de %d (%s)</html>", dir_proc, dir_tot, dir.getName(), fil_proc, fil_tot, sheet.getName());
-			SwingUtilities.invokeLater(() -> textOBS.setText(message));
+			//String message = String.format("<html>Processando pasta %d de %d (%s)...<br>Lendo planilha %d de %d (%s)</html>", dir_proc, dir_tot, dir.getName(), fil_proc, fil_tot, sheet.getName());
+			//SwingUtilities.invokeLater(() -> textOBS.setText(message));
 			
 		}
 		
@@ -641,7 +658,6 @@ public class RecursosGUI extends JFrame {
 				buttonOrigem.setEnabled(editable);
 				buttonDestino.setEnabled(editable);
 				
-				buttonLimpar.setEnabled(editable);
 				buttonProcessar.setEnabled(editable);
 				
 			});
@@ -657,7 +673,7 @@ public class RecursosGUI extends JFrame {
 				String disciplina = listaRecursos.get(0).getDisciplina();
 				disciplina = disciplina.substring(0,disciplina.indexOf("(")-1);
 				
-				String filename = String.format("%s/PSC (%s).pdf", dir_destino.getAbsolutePath(),disciplina);
+				String filename = String.format("%s/PSC (%s).pdf", targetDir.getAbsolutePath(),disciplina);
 				
 				return new File(filename);
 				
@@ -665,7 +681,7 @@ public class RecursosGUI extends JFrame {
 			
 			else if (concursoAtual == TipoConcurso.EAD) {
 				
-				String filename = String.format("%s/Recursos EAD.pdf", dir_destino.getAbsolutePath());
+				String filename = String.format("%s/Recursos EAD.pdf", targetDir.getAbsolutePath());
 				
 				return new File(filename);
 				
@@ -689,7 +705,7 @@ public class RecursosGUI extends JFrame {
 				// Por fim, monto o nome do arquivo com os códigos e nome de cargo + tratamentos de caracteres especiais em nome de arquivo
 				String filename = String.format("%s%s (Todos).pdf",builder.toString(),listaRecursos.get(0).getCargo().substring(7).replace("/"," - ").replace(":"," "));
 
-				return new File(dir_destino.getAbsolutePath() + "/" + filename);
+				return new File(targetDir.getAbsolutePath() + "/" + filename);
 				
 			}
 			
@@ -710,5 +726,11 @@ public class RecursosGUI extends JFrame {
 			return (column == 2);
 		}
 
+		@Override
+		public void setValueAt(Object aValue, int row, int column) {
+			super.setValueAt(aValue, row, column);
+			action_salva_config();
+		}
+		
 	}
 }

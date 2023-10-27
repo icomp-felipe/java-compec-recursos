@@ -1,2 +1,13 @@
 ########## Dicas
-hint-text-edital = Título do edital a ser impresso no cabeçalho das respostas
+hint-text-edital    = Título do edital a ser impresso no cabeçalho das respostas
+hint-button-edlimpa = Limpa o texto do título do edital
+hint-combo-tipo     = Tipo do concurso
+hint-datepicker     = Data de publicação das respostas aos recursos
+
+hint-text-origem    = Caminho da pasta com as planilhas de respostas
+hint-button-origem  = Seleciona a pasta com as planilhas de respostas
+
+hint-text-destino   = Caminho da pasta de saída das respostas aos recursos (em PDF)
+hint-button-destino = Seleciona a pasta de saída das respostas aos recursos (em PDF)
+
+hint-text-console = Informações de processamento
