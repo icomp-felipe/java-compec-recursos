@@ -15,11 +15,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import com.phill.libs.ui.AlertDialog;
+import com.phill.libs.ui.ESCDispose;
 import com.phill.libs.ui.GraphicsHelper;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.phill.libs.PropertiesManager;
 import com.phill.libs.ResourceManager;
 import com.phill.libs.files.PhillFileUtils;
+import com.phill.libs.i18n.PropertyBundle;
 import com.phill.libs.table.JTableMouseListener;
 import com.phill.libs.table.TableUtils;
 
@@ -31,56 +33,58 @@ import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.model.TipoConcurso;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
+/** Implementa a interface gráfica do sistema.
+ *  @author Felipe André - felipeandre.eng@gmail.com
+ *  @version 3.0, 27/OUT/2023 */
 public class RecursosGUI extends JFrame {
 
-	private static final long serialVersionUID = 1L;
-	private static final GraphicsHelper helper = GraphicsHelper.getInstance();
-	
-	private JTextField textEdital;
-	private JLabel textDestino, textOrigem, textOBS;
-	
-	private int dir_proc, fil_proc;
-	private int dir_tot, fil_tot;
-	
-	private File dir_origem, dir_destino;
-	private JLabel labelLoading;
-	private JButton buttonOrigem;
-	private JButton buttonDestino;
-	private JButton buttonSair;
-	private JButton buttonLimpar;
-	private JButton buttonProcessar;
-	
+	// Serial
+	private static final long serialVersionUID = 6968825769983359575L;
+
+	// Declaração de atributos gráficos
+	private final JTextField textEdital;
+	private final DatePicker datePicker;
+	private final JComboBox<String> comboConcursos;
 	private final JTable tablePlanilha;
     private final DefaultTableModel modelo;
-    private final DatePicker datePicker;
-    private final String[] colunas = new String [] {"#","Item","Coluna"};
-    
-    private JComboBox<String> comboConcursos;
-	private JLabel textItens;
-    
-	private ReportGenerator threadReports;
+	private final JLabel textItens, textDestino, textOrigem, textOBS, labelLoading;
+	private final JButton buttonOrigem, buttonDestino, buttonLimpar, buttonProcessar;
 	
+	// Declaração de atributos dinâmicos
+	private int dir_proc, fil_proc;
+	private int dir_tot, fil_tot;
+	private File dir_origem, dir_destino;
+    private String[] colunas = new String [] {"#","Item","Coluna"};
+	private ReportGenerator threadReports;
     private TipoConcurso concursoAtual;
 	
-	public static void main(String[] args) {
-		new RecursosGUI();
-	}
+	// Carregando bundle de idiomas
+	private final static PropertyBundle bundle = new PropertyBundle("i18n/portuguese", null);
+	
+    
+	public static void main(String[] args) { new RecursosGUI(); }
 
 	public RecursosGUI() {
-		
 		super("Recursys v.3.0");
 		
-		Font  fonte = helper.getFont ();
-		Color color = helper.getColor();
-		
-		setSize(720,545);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(false);
+		// Inicializando atributos gráficos
+		GraphicsHelper instance = GraphicsHelper.getInstance();
+		//GraphicsHelper.setFrameIcon(this,"icon/windows-icon.png");
+		ESCDispose.register(this);
 		getContentPane().setLayout(null);
 		
+		// Recuperando ícones
+		Icon searchIcon = ResourceManager.getIcon("icon/search-black.png",20,20);
+		Icon clearIcon  = ResourceManager.getIcon("icon/clear.png",20,20);
+		Icon reportIcon = ResourceManager.getIcon("icon/report.png",20,20);
+		Icon saveIcon   = ResourceManager.getIcon("icon/save.png",20,20);
+		
+		// Recuperando fontes e cores
+		Font  fonte = instance.getFont ();
+		Color color = instance.getColor();
+		
 		JPanel painelID = new JPanel();
-		painelID.setBorder(helper.getTitledBorder("Identificação do Concurso"));
+		painelID.setBorder(instance.getTitledBorder("Identificação do Concurso"));
 		painelID.setBounds(12, 10, 695, 105);
 		getContentPane().add(painelID);
 		painelID.setLayout(null);
@@ -91,6 +95,7 @@ public class RecursosGUI extends JFrame {
 		painelID.add(labelEdital);
 		
 		textEdital = new JTextField();
+		textEdital.setToolTipText(bundle.getString("hint-text-edital"));
 		textEdital.setFont(fonte);
 		textEdital.setForeground(color);
 		textEdital.setBounds(69, 33, 615, 25);
@@ -142,7 +147,7 @@ public class RecursosGUI extends JFrame {
 		columnModel.getColumn(1).setPreferredWidth(400);
 		
 		JPanel painelPlanilha = new JPanel();
-		painelPlanilha.setBorder(helper.getTitledBorder("Configuração da Planilha"));
+		painelPlanilha.setBorder(instance.getTitledBorder("Configuração da Planilha"));
 		painelPlanilha.setBounds(12, 120, 695, 220);
 		getContentPane().add(painelPlanilha);
 		painelPlanilha.setLayout(null);
@@ -151,11 +156,7 @@ public class RecursosGUI extends JFrame {
 		scrollPlanilha.setBounds(12, 22, 672, 150);
 		painelPlanilha.add(scrollPlanilha);
 		
-		Icon searchIcon = ResourceManager.getIcon("icon/search-black.png",20,20);
-		Icon clearIcon  = ResourceManager.getIcon("icon/clear.png",20,20);
-		Icon exitIcon   = ResourceManager.getIcon("icon/exit-black.png",20,20);
-		Icon reportIcon = ResourceManager.getIcon("icon/report.png",20,20);
-		Icon saveIcon   = ResourceManager.getIcon("icon/save.png",20,20);
+
 		
 		JButton botaoSalvaConfig = new JButton(saveIcon);
 		botaoSalvaConfig.addActionListener((event) -> action_salva_config());
@@ -175,7 +176,7 @@ public class RecursosGUI extends JFrame {
 		painelPlanilha.add(botaoSalvaConfig);
 		
 		JPanel painelPastas = new JPanel();
-		painelPastas.setBorder(helper.getTitledBorder("Pastas"));
+		painelPastas.setBorder(instance.getTitledBorder("Pastas"));
 		painelPastas.setBounds(12, 352, 696, 105);
 		getContentPane().add(painelPastas);
 		painelPastas.setLayout(null);
@@ -228,12 +229,6 @@ public class RecursosGUI extends JFrame {
 		labelLoading.setVisible(false);
 		getContentPane().add(labelLoading);
 		
-		buttonSair = new JButton(exitIcon);
-		buttonSair.setToolTipText("Sair do programa");
-		buttonSair.addActionListener((event) -> dispose());
-		buttonSair.setBounds(638, 474, 30, 25);
-		getContentPane().add(buttonSair);
-		
 		buttonLimpar = new JButton(clearIcon);
 		buttonLimpar.setToolTipText("Limpar os dados da tela");
 		buttonLimpar.addActionListener((event) -> action_clear());
@@ -248,6 +243,11 @@ public class RecursosGUI extends JFrame {
 		
 		init_load_combo();
 		
+		setSize(720,545);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		getContentPane().setLayout(null);
 		setVisible(true);
 		
 	}
@@ -641,7 +641,6 @@ public class RecursosGUI extends JFrame {
 				buttonOrigem.setEnabled(editable);
 				buttonDestino.setEnabled(editable);
 				
-				buttonSair.setEnabled(editable);
 				buttonLimpar.setEnabled(editable);
 				buttonProcessar.setEnabled(editable);
 				
