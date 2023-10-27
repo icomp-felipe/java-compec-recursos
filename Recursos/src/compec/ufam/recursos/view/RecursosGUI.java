@@ -422,7 +422,7 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			// Recuperando as colunas e dados
-			String[] columnNames = PropertiesManager.getStringArray(this.concursoAtual.getColumnNames(),null);
+			String[] columnNames = this.concursoAtual.getColumnNames();
 			String[] columns     = PropertiesManager.getStringArray(this.concursoAtual.getColumns(),null);
 			
 			// Simples tratamento de erros
@@ -667,28 +667,7 @@ public class RecursosGUI extends JFrame {
 		/** Recupera o nome do arquivo PDF de saída */
 		private File util_pdf_filename(ArrayList<Recurso> listaRecursos) {
 			
-			// No PSC, os documentos são gerados por disciplina, logo, o nome do arquivo é uma disciplina
-			if (concursoAtual == TipoConcurso.PSC) {
-				
-				String disciplina = listaRecursos.get(0).getDisciplina();
-				disciplina = disciplina.substring(0,disciplina.indexOf("(")-1);
-				
-				String filename = String.format("%s/PSC (%s).pdf", targetDir.getAbsolutePath(),disciplina);
-				
-				return new File(filename);
-				
-			}
 			
-			else if (concursoAtual == TipoConcurso.EAD) {
-				
-				String filename = String.format("%s/Recursos EAD.pdf", targetDir.getAbsolutePath());
-				
-				return new File(filename);
-				
-			}
-			
-			// No sistema está implementado apenas o PSC e PSTEC, logo, esse bloco é para o PSTEC
-			else {
 				
 				// Instanciando meu builder
 				StringBuilder builder = new StringBuilder();
@@ -707,7 +686,6 @@ public class RecursosGUI extends JFrame {
 
 				return new File(targetDir.getAbsolutePath() + "/" + filename);
 				
-			}
 			
 		}
 		

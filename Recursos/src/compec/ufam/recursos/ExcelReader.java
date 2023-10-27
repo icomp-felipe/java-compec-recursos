@@ -14,6 +14,38 @@ public class ExcelReader {
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
 	private static final DataFormatter    DATA_FORMATTER = new DataFormatter(Locale.getDefault());
 	
+	String[] indexes;
+	int[] indices;
+	
+	public List<Recurso> read(final File planilha) throws IOException {
+		
+		// Instanciando a lista de recursos
+		final List<Recurso> listaRecursos = new ArrayList<Recurso>();
+	
+		// Abrindo a planilha para leitura
+		FileInputStream stream    = new FileInputStream(planilha);
+		XSSFWorkbook workbook     = new XSSFWorkbook(stream);
+		XSSFSheet sheet           = workbook.getSheetAt(0);
+		Iterator<Row> rowIterator = sheet.iterator();
+		
+		// Pulando o cabeçalho
+		rowIterator.next();
+		
+		// Varrendo as linhas da planilha...
+		while (rowIterator.hasNext()) {
+							
+			Row row = rowIterator.next();
+			
+		}
+		
+		return listaRecursos;
+		
+	}
+	
+	private static String getNome(final Row row) {
+		return null;
+	}
+	
 	public static void read(File planilha, String[] colunas, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		// Preparando o ambiente...
@@ -128,7 +160,7 @@ public class ExcelReader {
 			
 			/* Agora uma aulinha básica de Excel:
 			 * For formula cells, excel stores two things. One is the Formula itself, the other is
-			 * the "cached" value (the last value that the formula was evaluated as). f you want to
+			 * the "cached" value (the last value that the formula was evaluated as). If you want to
 			 * get the last cached value (which may no longer be correct, but as long as Excel saved
 			 * the file and you haven't changed it it should be), you'll want something like:     */
 			case FORMULA:
