@@ -14,30 +14,28 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.jdatepicker.impl.JDatePickerImpl;
-
 import com.phill.libs.ui.AlertDialog;
 import com.phill.libs.ui.GraphicsHelper;
+import com.github.lgooddatepicker.components.DatePicker;
 import com.phill.libs.PropertiesManager;
 import com.phill.libs.ResourceManager;
 import com.phill.libs.files.PhillFileUtils;
 import com.phill.libs.table.JTableMouseListener;
 import com.phill.libs.table.TableUtils;
 
-import compec.ufam.recursos.DatePicker;
 import compec.ufam.recursos.ExcelReader;
 import compec.ufam.recursos.ListParser;
 import compec.ufam.recursos.ListSorter;
 import compec.ufam.recursos.io.PDFWriter;
 import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.model.TipoConcurso;
+import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
 public class RecursosGUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final GraphicsHelper helper = GraphicsHelper.getInstance();
 	
-	private final JDatePickerImpl data_realizacao;
 	private JTextField textEdital;
 	private JLabel textDestino, textOrigem, textOBS;
 	
@@ -54,6 +52,7 @@ public class RecursosGUI extends JFrame {
 	
 	private final JTable tablePlanilha;
     private final DefaultTableModel modelo;
+    private final DatePicker datePicker;
     private final String[] colunas = new String [] {"#","Item","Coluna"};
     
     private JComboBox<String> comboConcursos;
@@ -69,7 +68,7 @@ public class RecursosGUI extends JFrame {
 
 	public RecursosGUI() {
 		
-		super("Processador de Recursos - v.2.0");
+		super("Recursys v.3.0");
 		
 		Font  fonte = helper.getFont ();
 		Color color = helper.getColor();
@@ -103,9 +102,14 @@ public class RecursosGUI extends JFrame {
 		labelData.setBounds(12, 70, 262, 20);
 		painelID.add(labelData);
 		
-		data_realizacao = DatePicker.getDatePicker();
+		datePicker = LGoodDatePickerUtils.getDatePicker();
+		datePicker.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
+		datePicker.setBounds(265, 70, 145, 30);
+		painelID.add(datePicker);
+		
+		/*data_realizacao = DatePicker.getDatePicker();
 		data_realizacao.setBounds(265, 70, 140, 25);
-		painelID.add(data_realizacao);
+		painelID.add(data_realizacao);*/
 		
 		JLabel labelTipoConcurso = new JLabel("Tipo de Concurso:");
 		labelTipoConcurso.setFont(fonte);
@@ -256,7 +260,7 @@ public class RecursosGUI extends JFrame {
 			return;
 		
 		textEdital.setText(null);
-		data_realizacao.getJFormattedTextField().setText(null);
+		//data_realizacao.getJFormattedTextField().setText(null);
 		
 		textOrigem.setText("<Selecionar Arquivo>");
 		textDestino.setText("<Selecionar Arquivo>");
@@ -272,7 +276,7 @@ public class RecursosGUI extends JFrame {
 		
 		// Recuperando os dados da tela
 		String    edital = textEdital.getText().trim();
-		String      data = data_realizacao.getJFormattedTextField().getText();
+		String      data = null; //data_realizacao.getJFormattedTextField().getText();
 		
 		// Se os dados da tela são válidos, inicio os trabalhos
 		if (util_parse_view(edital,data)) {
