@@ -6,45 +6,108 @@ import java.util.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
+import com.phill.libs.StringUtils;
+import com.phill.libs.time.PhillsDateParser;
+import com.phill.libs.time.PhillsDateUtils;
+
+import compec.ufam.recursos.model.Fields;
 import compec.ufam.recursos.model.Recurso;
+import compec.ufam.recursos.model.Recurso2;
 
 public class ExcelReader {
 
-	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
+	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	private static final DataFormatter    DATA_FORMATTER = new DataFormatter(Locale.getDefault());
 	
-	String[] indexes;
-	int[] indices;
-	
-	public List<Recurso> read(final File planilha) throws IOException {
+	public static List<Recurso2> read(final File planilha, final Integer[] indexes) {
 		
 		// Instanciando a lista de recursos
-		final List<Recurso> listaRecursos = new ArrayList<Recurso>();
-	
-		// Abrindo a planilha para leitura
-		FileInputStream stream    = new FileInputStream(planilha);
-		XSSFWorkbook workbook     = new XSSFWorkbook(stream);
-		XSSFSheet sheet           = workbook.getSheetAt(0);
-		Iterator<Row> rowIterator = sheet.iterator();
+		final List<Recurso2> listaRecursos = new ArrayList<Recurso2>();
 		
-		// Pulando o cabeçalho
-		rowIterator.next();
-		
-		// Varrendo as linhas da planilha...
-		while (rowIterator.hasNext()) {
-							
-			Row row = rowIterator.next();
+		try {
+			
+			// Abrindo a planilha para leitura
+			FileInputStream stream    = new FileInputStream(planilha);
+			XSSFWorkbook workbook     = new XSSFWorkbook(stream);
+			XSSFSheet sheet           = workbook.getSheetAt(0);
+			Iterator<Row> rowIterator = sheet.iterator();
+			
+			// Pulando o cabeçalho
+			rowIterator.next();
+			
+			// Varrendo as linhas da planilha...
+			while (rowIterator.hasNext()) {
+								
+				Row row = rowIterator.next();
+				
+				final Recurso2 recurso = new Recurso2();
+				
+				// Carregando os dados de um recurso da linha atual da planilha
+				recurso.setNomeCandidato(getNome(row, indexes));
+				recurso.setDataRecurso(getDataRecurso(row, indexes));
+				
+				listaRecursos.add(recurso);
+				
+			}
+			
+			System.out.println(listaRecursos.size());
+			
+		}
+		catch (Exception exception) {
+			
+			exception.printStackTrace();
+			return null;
 			
 		}
 		
 		return listaRecursos;
-		
 	}
 	
-	private static String getNome(final Row row) {
-		return null;
+	/****************** Bloco de Extração de Dados da Planilha *****************/
+	
+	private static LocalDateTime getDataRecurso(final Row row, final Integer[] indexes) {
+		
+		final Cell cell = row.getCell( indexes[Fields.TIMESTAMP.getIndex()] );
+		String rawData  = getCellContent(cell);
+		
+		DateTime dt = PhillsDateParser.createDate(rawData, "dd/MM/yyyy HH:mm:ss");
+		
+		if (dt != null)
+			System.out.println(dt.toString("dd/MM/yyyy HH:mm:ss"));
+		
+		return dt == null ? null : dt.toLocalDateTime();
 	}
+	
+	/** @return Nome do candidato.
+	 *  @param row - linha da planilha */
+	private static String getNome(final Row row, final Integer[] indexes) {
+		
+		final Cell cell = row.getCell( indexes[Fields.NOME.getIndex()] );
+		String rawData  = getCellContent(cell);
+		
+		return StringUtils.trim(rawData);
+	}
+	
+	
+	/*
+	 * Fields.TIMESTAMP.getRowData(),
+												   Fields.NOME.getRowData(),
+												   Fields.CPF.getRowData(),
+												   Fields.INSCRICAO.getRowData(),
+												   Fields.CARGO.getRowData(),
+												   Fields.DISCIPLINA.getRowData(),
+												   Fields.QUESTAO.getRowData(),
+												   Fields.QUESTIONAMENTO.getRowData(),
+												   Fields.ANEXOS.getRowData(),
+												   Fields.RECURSO.getRowData(),
+												   Fields.PARECER.getRowData(),
+												   Fields.DECISAO.getRowData(),
+	 * */
+	
+	
 	
 	public static void read(File planilha, String[] colunas, ArrayList<Recurso> listaRecursos) throws Exception {
 		

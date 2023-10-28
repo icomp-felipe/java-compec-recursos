@@ -3,12 +3,14 @@ package compec.ufam.recursos.view;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -30,9 +32,12 @@ import com.phill.libs.table.JTableMouseListener;
 import compec.ufam.recursos.ExcelReader;
 import compec.ufam.recursos.ListParser;
 import compec.ufam.recursos.ListSorter;
+import compec.ufam.recursos.io.DirectoryParser;
 import compec.ufam.recursos.io.PDFWriter;
 import compec.ufam.recursos.model.Constants;
+import compec.ufam.recursos.model.Fields;
 import compec.ufam.recursos.model.Recurso;
+import compec.ufam.recursos.model.Recurso2;
 import compec.ufam.recursos.model.TipoConcurso;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
@@ -60,7 +65,6 @@ public class RecursosGUI extends JFrame {
 	private final MandatoryFieldsManager fieldValidator;
 	private final MandatoryFieldsLogger  fieldLogger;
 	
-	private static final int ITENS = 12;
 	private static final int excelColumnID = 2;
 	
 	private int dir_proc, fil_proc;
@@ -269,6 +273,8 @@ public class RecursosGUI extends JFrame {
 	
 	/******************** Bloco de Tratamento de Eventos de Botões *************************/
 	
+	private Map<File, List<Recurso2>> mapaRecursos;
+	
 	/** Carrega e analisa todas as planilhas do diretório informado. */
 	private void actionParse() {
 		
@@ -283,6 +289,11 @@ public class RecursosGUI extends JFrame {
 			fieldLogger.clear(); return;
 									
 		}
+		
+		// Iniciando o processo de análise das planilhas
+		Thread parser = new Thread(() -> threadParser());
+		parser.setName("Thread analista de planilhas");
+		parser.start();
 		
 	}
 	
@@ -325,9 +336,9 @@ public class RecursosGUI extends JFrame {
 	 *  @return Array contendo as colunas configuradas na tabela. */
 	private String[] utilGetColumnsFromTable() {
 		
-		final String[] columns = new String[ITENS];
+		final String[] columns = new String[Constants.fieldCount];
 		
-		for (int row=0; row<ITENS; row++) {
+		for (int row=0; row<Constants.fieldCount; row++) {
 			
 			Object data = modelPlanilha.getValueAt(row, excelColumnID);
 			
@@ -360,6 +371,22 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
+	/** Ativa ou desativa os campos de entrada de dados necessários para a análise das planilhas.
+	 *  @param lock - estado da ativação dos campos */
+	private void utilLockParseUI(final boolean lock) {
+		
+		final boolean enabled = !lock;
+		
+		SwingUtilities.invokeLater(() -> {
+			
+			labelInfo.setVisible(lock);
+			tablePlanilha.setEnabled(enabled);
+			buttonOrigem.setEnabled (enabled);
+			
+		});
+		
+	}
+	
 	/** Salva a configuração de colunas na tabela no arquivo de propriedades do sistema. */
 	private void utilSaveProperty() {
 
@@ -389,7 +416,7 @@ public class RecursosGUI extends JFrame {
 		
 		final String[] columns = utilGetColumnsFromTable();
 
-		for (int i=0; i<ITENS; i++)
+		for (int i=0; i<Constants.fieldCount; i++)
 			
 			if (i != 4 && columns[i] == null)
 				return false;
@@ -400,7 +427,7 @@ public class RecursosGUI extends JFrame {
 	
 	/*************************** Bloco de Métodos em Thread ********************************/
 	
-	/** Analisa o diretório de origem de planilhas */
+	/** Analisa o diretório de origem de planilhas. */
 	private void threadExplorer() {
 		
 		try {
@@ -446,6 +473,28 @@ public class RecursosGUI extends JFrame {
 		
 	}
 
+	/** Analisa todos as planilhas contidas na pasta informada. */
+	private void threadParser() {
+		
+		try {
+			
+			utilLockParseUI(true);
+			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable());
+			
+		} catch (Exception exception) {
+			
+			exception.printStackTrace();
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-parser-error"));
+			
+		}
+		finally {
+			
+			utilLockParseUI(false);
+			
+		}
+		
+	}
+	
 	/** Valida os dados da tela e, se tudo estiver certo, inicia a geração de relatórios */
 	private void action_proccess() {
 		
@@ -715,23 +764,26 @@ public class RecursosGUI extends JFrame {
 		private static final long serialVersionUID = 8528128752920533163L;
 
 		private static final String[]  colunas = { "#","Item","Coluna" };
-		private static final Object[][] linhas = { { 1, "Data e hora do recurso"    },
-												   { 2, "Nome do candidato"         },
-												   { 3, "CPF do candidato"          },
-												   { 4, "Número de inscrição"       },
-												   { 5, "Cargo (quando couber)"     },
-												   { 6, "Disciplina"                },
-												   { 7, "Questão"                   },
-												   { 8, "Questionamento (Candidato)"},
-												   { 9, "Anexos (Candidato)"        },
-												   {10, "Recurso (Candidato)"       },
-												   {11, "Parecer (Banca)"           },
-												   {12, "Decisão (Banca)"           },
+		private static final Object[][] linhas = { Fields.TIMESTAMP.getRowData(),
+												   Fields.NOME.getRowData(),
+												   Fields.CPF.getRowData(),
+												   Fields.INSCRICAO.getRowData(),
+												   Fields.CARGO.getRowData(),
+												   Fields.DISCIPLINA.getRowData(),
+												   Fields.QUESTAO.getRowData(),
+												   Fields.QUESTIONAMENTO.getRowData(),
+												   Fields.ANEXOS.getRowData(),
+												   Fields.RECURSO.getRowData(),
+												   Fields.PARECER.getRowData(),
+												   Fields.DECISAO.getRowData(),
 												 };
 		
 		/** Construtor inicializando o modelo com as colunas e linhas pré-definidas. */
 		public RecursoTableModel() {
 			super(linhas, colunas);
+			
+			//Object[] a = Stream.of(Fields.values()).map(Fields::getRowData).toArray();
+			
 		}
 
 		/** Define apenas a coluna 'Coluna' como editável. */
@@ -760,4 +812,5 @@ public class RecursosGUI extends JFrame {
 		}
 		
 	}
+	
 }
