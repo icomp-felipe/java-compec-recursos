@@ -6,7 +6,7 @@ public class Recurso2 {
 
 	private LocalDateTime dataRecurso;
 	private String nomeCandidato, cpfCandidato;
-	private int inscricao, questao;
+	private Integer inscricao, questao;
 	private String objeto, disciplina;
 	private String questionamentoCandidato, anexoCandidato, alteracaoCandidato;
 	private String parecerBanca, respostaBanca;
@@ -31,13 +31,13 @@ public class Recurso2 {
 	public int getInscricao() {
 		return inscricao;
 	}
-	public void setInscricao(int inscricao) {
+	public void setInscricao(Integer inscricao) {
 		this.inscricao = inscricao;
 	}
 	public int getQuestao() {
 		return questao;
 	}
-	public void setQuestao(int questao) {
+	public void setQuestao(Integer questao) {
 		this.questao = questao;
 	}
 	public String getObjeto() {

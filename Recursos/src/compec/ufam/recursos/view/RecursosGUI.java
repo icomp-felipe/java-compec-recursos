@@ -656,7 +656,7 @@ public class RecursosGUI extends JFrame {
 						fil_proc++;
 						util_obs_reading(dir_planilhas,arquivo);
 						
-						ExcelReader.read(arquivo,this.colunas,listaRecursos);
+						//ExcelReader.read(arquivo,this.colunas,listaRecursos);
 						
 					}
 					
