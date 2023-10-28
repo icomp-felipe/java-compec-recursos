@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import compec.ufam.recursos.ExcelReader;
 import compec.ufam.recursos.ListParser;
 import compec.ufam.recursos.ListSorter;
 import compec.ufam.recursos.io.PDFWriter;
+import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.model.TipoConcurso;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
@@ -49,9 +51,8 @@ public class RecursosGUI extends JFrame {
 	// Declaração de atributos gráficos
 	private final JTextField textEdital, textDestino, textOrigem;
 	private final DatePicker datePicker;
-	private final JComboBox<String> comboTipo;
 	private final JTable tablePlanilha;
-    private final DefaultTableModel modelPlanilha;
+    private final RecursoTableModel modelPlanilha;
     private final JLabel labelInfo;
     private final JTextArea textConsole;
 	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonProcessar;
@@ -59,7 +60,8 @@ public class RecursosGUI extends JFrame {
 	// Declaração de atributos dinâmicos
 	private File sourceDir, targetDir;
 	
-	
+	private static final int ITENS = 12;
+	private static final int excelColumnID = 2;
 	
 	private int dir_proc, fil_proc;
 	
@@ -96,7 +98,7 @@ public class RecursosGUI extends JFrame {
 		// Painel 'Concurso'
 		JPanel panelConcurso = new JPanel();
 		panelConcurso.setBorder(instance.getTitledBorder("Concurso"));
-		panelConcurso.setBounds(10, 10, 780, 105);
+		panelConcurso.setBounds(10, 10, 780, 70);
 		panelConcurso.setLayout(null);
 		getContentPane().add(panelConcurso);
 		
@@ -110,53 +112,39 @@ public class RecursosGUI extends JFrame {
 		textEdital.setToolTipText(bundle.getString("hint-text-edital"));
 		textEdital.setFont(fonte);
 		textEdital.setForeground(color);
-		textEdital.setBounds(65, 30, 660, 25);
+		textEdital.setBounds(65, 30, 415, 25);
 		panelConcurso.add(textEdital);
 		
 		buttonEditalLimpa = new JButton(clearIcon);
 		buttonEditalLimpa.setToolTipText(bundle.getString("hint-button-edlimpa"));
 		buttonEditalLimpa.addActionListener((event) -> { textEdital.setText(null); textEdital.requestFocus(); } );
-		buttonEditalLimpa.setBounds(735, 30, 30, 25);
+		buttonEditalLimpa.setBounds(490, 30, 30, 25);
 		panelConcurso.add(buttonEditalLimpa);
 		
-		JLabel labelTipo = new JLabel("Tipo:");
-		labelTipo.setHorizontalAlignment(JLabel.RIGHT);
-		labelTipo.setFont(fonte);
-		labelTipo.setBounds(10, 65, 50, 20);
-		panelConcurso.add(labelTipo);
-		
-		comboTipo = new JComboBox<String>();
-		comboTipo.addActionListener((event) -> action_update_table());
-		comboTipo.setToolTipText(bundle.getString("hint-combo-tipo"));
-		comboTipo.setForeground(color);
-		comboTipo.setFont(fonte);
-		comboTipo.setBounds(65, 65, 125, 24);
-		panelConcurso.add(comboTipo);
-		
-		JLabel labelData = new JLabel("Data de Publicação:");
+		JLabel labelData = new JLabel("Publicação:");
 		labelData.setHorizontalAlignment(JLabel.RIGHT);
 		labelData.setFont(fonte);
-		labelData.setBounds(205, 68, 140, 20);
+		labelData.setBounds(530, 30, 85, 20);
 		panelConcurso.add(labelData);
 		
 		datePicker = LGoodDatePickerUtils.getDatePicker();
 		datePicker.getComponentDateTextField().setToolTipText(bundle.getString("hint-datepicker"));
 		datePicker.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
-		datePicker.setBounds(350, 65, 145, 30);
+		datePicker.setBounds(620, 27, 145, 30);
 		panelConcurso.add(datePicker);
 		
 		// Painel 'Planilhas de Entrada'
 		JPanel panelPlanilha = new JPanel();
 		panelPlanilha.setBorder(instance.getTitledBorder("Planilhas de Entrada"));
-		panelPlanilha.setBounds(10, 115, 780, 220);
+		panelPlanilha.setBounds(10, 80, 780, 255);
 		panelPlanilha.setLayout(null);
 		getContentPane().add(panelPlanilha);
 		
 		JScrollPane scrollPlanilha = new JScrollPane();
-		scrollPlanilha.setBounds(10, 25, 760, 186);
+		scrollPlanilha.setBounds(10, 25, 760, 221);
 		panelPlanilha.add(scrollPlanilha);
 		
-		modelPlanilha = new MyTableModel(new String [] {"#","Item","Coluna"});
+		modelPlanilha = new RecursoTableModel();
 		
 		tablePlanilha = new JTable(modelPlanilha);
 		tablePlanilha.setRowHeight(20);
@@ -256,8 +244,7 @@ public class RecursosGUI extends JFrame {
 		buttonProcessar.setBounds(760, 683, 30, 25);
 		getContentPane().add(buttonProcessar);
 		
-		
-		init_load_combo();
+		utilLoadProperty();
 		
 		setSize(800, 720);
 		setLocationRelativeTo(null);
@@ -297,6 +284,53 @@ public class RecursosGUI extends JFrame {
 			Thread explorer = new Thread(() -> threadExplorer());
 			explorer.setName("Thread exploradora de diretório de origem");
 			explorer.start();
+			
+		}
+		
+	}
+	
+	/************************* Bloco de Métodos Utilitários *******************************/
+	
+	/** Carrega a configuração de colunas na tabela, a partir do arquivo de propriedades do sistema. */
+	private void utilLoadProperty() {
+		
+		try {
+			
+			// Carrega a configuração do arquivo de propriedades
+			final String[] columns = PropertiesManager.getStringArray(Constants.excelColumnsProperty, null);
+			
+			// Atualiza a tabela
+			for (int row=0; row<columns.length; row++)
+				modelPlanilha.setValueAt(columns[row], row, excelColumnID, false);
+			
+		} catch (Exception exception) {
+			
+			exception.printStackTrace();
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-load-prop-error"));
+			
+		}
+		
+	}
+	
+	/** Salva a configuração de colunas na tabela no arquivo de propriedades do sistema. */
+	private void utilSaveProperty() {
+
+		try {
+		
+			final String[] columns = new String[ITENS];
+			
+			// Varre todas as linhas da tabela recuperando as colunas configuradas
+			for (int row=0; row<ITENS; row++)
+				columns[row] = modelPlanilha.getValueAt(row, excelColumnID) == null ? null : modelPlanilha.getValueAt(row, excelColumnID).toString();
+			
+			// Salvando configuração no arquivo de propriedades
+			PropertiesManager.setStringArray(Constants.excelColumnsProperty, columns, null);
+			
+		}
+		catch (Exception exception) {
+			
+			exception.printStackTrace();
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-save-prop-error"));
 			
 		}
 		
@@ -375,41 +409,7 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-	/** Salva a configuração de planilhas no arquivo de propriedades */
-	private void action_salva_config() {
 
-		// Configurando as variáveis
-		final int rows = modelPlanilha.getRowCount();
-		
-		try {
-		
-			final String[] columns = new String[rows];
-			
-			// Varre todas as linhas da tabela recuperando as colunas configuradas
-			for (int i=0; i<rows; i++)
-				columns[i] = modelPlanilha.getValueAt(i,2).toString();
-			
-			// Salvando configuração no arquivo de propriedades
-			PropertiesManager.setStringArray(this.concursoAtual.getColumns(),columns,null);
-			
-			// Alertando usuário
-			AlertDialog.info(this, "Configuração de planilha salva com sucesso!");
-		
-		}
-		catch (Exception exception) {
-			
-			exception.printStackTrace();
-			AlertDialog.error(this, "Salvando configuração","Houve algum erro durante o salvamento de configuração.\nFavor consultar o console para mais infos.");
-			
-		}
-		finally {
-			
-			// Recarregando configurações
-			action_update_table();
-			
-		}
-		
-	}
 	
 
 	
@@ -417,7 +417,7 @@ public class RecursosGUI extends JFrame {
 	private void action_update_table() {
 
 		// Recuperando o concurso selecionado
-		this.concursoAtual = TipoConcurso.valueOf(comboTipo.getSelectedItem().toString());
+		//this.concursoAtual = TipoConcurso.valueOf(comboTipo.getSelectedItem().toString());
 		
 		try {
 			
@@ -455,8 +455,8 @@ public class RecursosGUI extends JFrame {
 	/** Inicializa o combo de tipos de concurso */
 	private void init_load_combo() {
 		
-		for (TipoConcurso concurso: TipoConcurso.values())
-			comboTipo.addItem(concurso.name());
+		/*for (TipoConcurso concurso: TipoConcurso.values())
+			comboTipo.addItem(concurso.name());*/
 		
 	}
 
@@ -691,24 +691,58 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-	private class MyTableModel extends DefaultTableModel {
+	/** Implementa o modelo de dados da tabela de configuração de colunas das planilhas de entrada.
+	 *  @author Felipe André - felipeandre.eng@gmail.com
+	 *  @version 3.0, 28/OUT/2023 */
+	private class RecursoTableModel extends DefaultTableModel {
 
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 8528128752920533163L;
+
+		private static final String[]  colunas = { "#","Item","Coluna" };
+		private static final Object[][] linhas = { { 1, "Data e hora do recurso"    },
+												   { 2, "Nome do candidato"         },
+												   { 3, "CPF do candidato"          },
+												   { 4, "Número de inscrição"       },
+												   { 5, "Cargo (quando couber)"     },
+												   { 6, "Disciplina"                },
+												   { 7, "Questão"                   },
+												   { 8, "Questionamento (Candidato)"},
+												   { 9, "Anexos (Candidato)"        },
+												   {10, "Recurso (Candidato)"       },
+												   {11, "Parecer (Banca)"           },
+												   {12, "Decisão (Banca)"           },
+												 };
 		
-		public MyTableModel(String[] colunas) {
-			super(null,colunas);
+		/** Construtor inicializando o modelo com as colunas e linhas pré-definidas. */
+		public RecursoTableModel() {
+			super(linhas, colunas);
 		}
-		
+
+		/** Define apenas a coluna 'Coluna' como editável. */
 		@Override
 		public boolean isCellEditable(int row, int column) {
 			return (column == 2);
 		}
 
+		/** Atualiza a tabela e salva a configuração de colunas no arquivo de propriedades.
+		 *  @param aValue - valor a ser aplicado
+		 *  @param row - número da linha (começa em 0)
+		 *  @param column - número da coluna (começa em 0) */
 		@Override
 		public void setValueAt(Object aValue, int row, int column) {
 			super.setValueAt(aValue, row, column);
-			action_salva_config();
+			utilSaveProperty();
+		}
+		
+		/** Este método apenas atualiza a tabela, ignorando o salvamento no arquivo de propriedades.
+		 *  @param aValue - valor a ser aplicado
+		 *  @param row - número da linha (começa em 0)
+		 *  @param column - número da coluna (começa em 0)
+		 *  @param update - parâmetro não é utilizado na função, existe apenas para diferenciar do método {@link RecursoTableModel#setValueAt(Object, int, int)} */
+		public void setValueAt(Object aValue, int row, int column, boolean update) {
+			super.setValueAt(aValue, row, column);
 		}
 		
 	}
+	
 }

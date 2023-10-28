@@ -7,7 +7,7 @@ public class Recurso2 {
 	private LocalDateTime dataRecurso;
 	private String nomeCandidato, cpfCandidato;
 	private int inscricao, questao;
-	private String cargo, disciplina;
+	private String objeto, disciplina;
 	private String questionamentoCandidato, anexoCandidato, alteracaoCandidato;
 	private String parecerBanca, respostaBanca;
 	

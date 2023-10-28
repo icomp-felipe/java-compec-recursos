@@ -11,3 +11,12 @@ hint-text-destino   = Caminho da pasta de saída das respostas aos recursos (em 
 hint-button-destino = Seleciona a pasta de saída das respostas aos recursos (em PDF)
 
 hint-text-console = Informações de processamento
+
+########## Métodos
+! RecursosUI::utilLoadProperty
+rui-load-prop-error = Falha ao carregar a configuração de colunas!\n\
+                      Verifique o console para mais informações.
+
+! RecursosUI::utilSaveProperty
+rui-save-prop-error = Falha ao salvar a configuração de colunas!\n\
+                      Verifique o console para mais informações.
