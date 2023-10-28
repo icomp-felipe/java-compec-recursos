@@ -2,20 +2,15 @@ package compec.ufam.recursos.io;
 
 import java.io.*;
 import java.text.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 
 import com.phill.libs.StringUtils;
 import com.phill.libs.time.PhillsDateParser;
-import com.phill.libs.time.PhillsDateUtils;
 
-import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Fields;
-import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.model.Recurso2;
 
 public class ExcelReader {
@@ -50,6 +45,8 @@ public class ExcelReader {
 			while (rowIterator.hasNext()) {
 								
 				Row row = rowIterator.next();
+
+				if (isEmptyRow(row)) break;
 				
 				final Recurso2 recurso = new Recurso2();
 				
@@ -84,6 +81,29 @@ public class ExcelReader {
 		return listaRecursos;
 	}
 	
+	/** Verifica se uma linha da planilha é vazia.
+	 *  @param row - linha da planilha
+	 *  @return 'true' se <code>row</code> for nula, ou não conter dados */
+	private static boolean isEmptyRow(final Row row) {
+		
+	    if (row == null)
+	        return true;
+	    
+	    if (row.getLastCellNum() <= 0)
+	        return true;
+	    
+	    for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+	    	
+	        Cell cell = row.getCell(cellNum);
+	        
+	        if (cell != null && cell.getCellType() != CellType.BLANK && !cell.toString().isBlank())
+	            return false;
+	        
+	    }
+	    
+	    return true;
+	}
+	
 	private static boolean parseHeader(final Row row, final Integer[] indexes) {
 		
 		for (Fields field: Fields.values())
@@ -98,21 +118,14 @@ public class ExcelReader {
 	private static LocalDateTime getDataRecurso(final Row row, final Integer[] indexes) {
 		
 		final Cell cell = row.getCell( indexes[Fields.TIMESTAMP.getIndex()] );
-		String rawData  = getCellContent(cell);
 		
-		DateTime dt = PhillsDateParser.createDate(rawData, "dd/MM/yyyy HH:mm:ss");
-		
-		return dt == null ? null : dt.toLocalDateTime();
+		return cell == null ? null : cell.getLocalDateTimeCellValue();
 	}
 	
 	/** @return Nome do candidato.
 	 *  @param row - linha da planilha */
 	private static String getNome(final Row row, final Integer[] indexes) {
-		
-		final Cell cell = row.getCell( indexes[Fields.NOME.getIndex()] );
-		String rawData  = getCellContent(cell);
-		
-		return StringUtils.trim(rawData);
+		return getCellContent(row.getCell( indexes[Fields.NOME.getIndex()] ));
 	}
 	
 	/** @return CPF do candidato.

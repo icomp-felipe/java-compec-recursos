@@ -1,5 +1,8 @@
 package compec.ufam.recursos.model;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
 import org.joda.time.*;
 
 public class Recurso2 {
@@ -13,8 +16,8 @@ public class Recurso2 {
 	public LocalDateTime getDataRecurso() {
 		return dataRecurso;
 	}
-	public void setDataRecurso(LocalDateTime dataRecurso) {
-		this.dataRecurso = dataRecurso;
+	public void setDataRecurso(java.time.LocalDateTime  localDateTime) {
+		this.dataRecurso = localDateTime == null ? null : new LocalDateTime(localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
 	}
 	public String getNomeCandidato() {
 		return nomeCandidato;
