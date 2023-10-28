@@ -4,9 +4,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +23,9 @@ import com.phill.libs.PropertiesManager;
 import com.phill.libs.ResourceManager;
 import com.phill.libs.files.PhillFileUtils;
 import com.phill.libs.i18n.PropertyBundle;
+import com.phill.libs.mfvapi.MandatoryFieldsLogger;
+import com.phill.libs.mfvapi.MandatoryFieldsManager;
 import com.phill.libs.table.JTableMouseListener;
-import com.phill.libs.table.TableUtils;
 
 import compec.ufam.recursos.ExcelReader;
 import compec.ufam.recursos.ListParser;
@@ -36,9 +35,6 @@ import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.model.TipoConcurso;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /** Implementa a interface gráfica do sistema.
  *  @author Felipe André - felipeandre.eng@gmail.com
@@ -55,10 +51,14 @@ public class RecursosGUI extends JFrame {
     private final RecursoTableModel modelPlanilha;
     private final JLabel labelInfo;
     private final JTextArea textConsole;
-	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonProcessar;
+	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonParse, buttonExport;
 	
 	// Declaração de atributos dinâmicos
 	private File sourceDir, targetDir;
+	
+	// MFV API
+	private final MandatoryFieldsManager fieldValidator;
+	private final MandatoryFieldsLogger  fieldLogger;
 	
 	private static final int ITENS = 12;
 	private static final int excelColumnID = 2;
@@ -87,7 +87,7 @@ public class RecursosGUI extends JFrame {
 		Icon searchIcon = ResourceManager.getIcon("icon/search.png"   , 20, 20);
 		Icon clearIcon  = ResourceManager.getIcon("icon/trash.png"    , 20, 20);
 		Icon reportIcon = ResourceManager.getIcon("icon/doc_empty.png", 20, 20);
-		Icon saveIcon   = ResourceManager.getIcon("icon/save.png"     , 20, 20);
+		Icon parseIcon  = ResourceManager.getIcon("icon/cog.png"      , 20, 20);
 		Icon loading = new ImageIcon(ResourceManager.getResource("icon/loading.gif"));
 		
 		// Recuperando fontes e cores
@@ -238,13 +238,26 @@ public class RecursosGUI extends JFrame {
 		labelInfo.setBounds(10, 685, 170, 20);
 		getContentPane().add(labelInfo);
 		
-		buttonProcessar = new JButton(reportIcon);
-		buttonProcessar.setToolTipText("Gerar os recursos em PDF");
-		buttonProcessar.addActionListener((event) -> action_proccess());
-		buttonProcessar.setBounds(760, 683, 30, 25);
-		getContentPane().add(buttonProcessar);
+		buttonParse = new JButton(parseIcon);
+		buttonParse.setToolTipText(bundle.getString("hint-button-parse"));
+		buttonParse.addActionListener((event) -> actionParse());
+		buttonParse.setBounds(720, 683, 30, 25);
+		getContentPane().add(buttonParse);
+		
+		buttonExport = new JButton(reportIcon);
+		buttonExport.setToolTipText(bundle.getString("hint-button-export"));
+		buttonExport.addActionListener((event) -> action_proccess());
+		buttonExport.setBounds(760, 683, 30, 25);
+		getContentPane().add(buttonExport);
 		
 		utilLoadProperty();
+		
+		// Cadastrando validação de campos
+		this.fieldValidator = new MandatoryFieldsManager();
+		this.fieldLogger    = new MandatoryFieldsLogger ();
+		
+		fieldValidator.addPermanent(labelOrigem , () -> sourceDir != null, bundle.getString("rui-mfv-sourcedir"), false);
+		fieldValidator.addPermanent(new JLabel(), () -> validateColumns(), bundle.getString("rui-mfv-columnsOk"), false);
 		
 		setSize(800, 720);
 		setLocationRelativeTo(null);
@@ -255,6 +268,23 @@ public class RecursosGUI extends JFrame {
 	}
 	
 	/******************** Bloco de Tratamento de Eventos de Botões *************************/
+	
+	/** Carrega e analisa todas as planilhas do diretório informado. */
+	private void actionParse() {
+		
+		// Realizando validação dos campos antes de prosseguir
+		fieldValidator.validate(fieldLogger);
+		
+		if (fieldLogger.hasErrors()) {
+			
+			final String errors = bundle.getFormattedString("rui-parse-errors", fieldLogger.getErrorString());
+					
+			AlertDialog.error(this, getTitle(), errors);
+			fieldLogger.clear(); return;
+									
+		}
+		
+	}
 	
 	/** Seleciona o diretório de destino das respostas aos recursos. */
 	private void actionSelectDestino() {
@@ -291,6 +321,24 @@ public class RecursosGUI extends JFrame {
 	
 	/************************* Bloco de Métodos Utilitários *******************************/
 	
+	/** Recupera as colunas configuradas na tabela para um array de strings.
+	 *  @return Array contendo as colunas configuradas na tabela. */
+	private String[] utilGetColumnsFromTable() {
+		
+		final String[] columns = new String[ITENS];
+		
+		for (int row=0; row<ITENS; row++) {
+			
+			Object data = modelPlanilha.getValueAt(row, excelColumnID);
+			
+			columns[row] = (data == null || data.toString().isBlank()) ? null : data.toString();
+			
+		}
+		
+		return columns;
+		
+	}
+	
 	/** Carrega a configuração de colunas na tabela, a partir do arquivo de propriedades do sistema. */
 	private void utilLoadProperty() {
 		
@@ -317,14 +365,10 @@ public class RecursosGUI extends JFrame {
 
 		try {
 		
-			final String[] columns = new String[ITENS];
-			
-			// Varre todas as linhas da tabela recuperando as colunas configuradas
-			for (int row=0; row<ITENS; row++)
-				columns[row] = modelPlanilha.getValueAt(row, excelColumnID) == null ? null : modelPlanilha.getValueAt(row, excelColumnID).toString();
-			
-			// Salvando configuração no arquivo de propriedades
-			PropertiesManager.setStringArray(Constants.excelColumnsProperty, columns, null);
+			PropertiesManager.setStringArray(Constants.excelColumnsProperty,
+					                         utilGetColumnsFromTable(),
+					                         null
+					                        );
 			
 		}
 		catch (Exception exception) {
@@ -333,6 +377,24 @@ public class RecursosGUI extends JFrame {
 			AlertDialog.error(this, getTitle(), bundle.getString("rui-save-prop-error"));
 			
 		}
+		
+	}
+	
+	/************************* Bloco de Validadores de Dados *******************************/
+	
+	/** Verifica se todos os campos obrigatórios da tabela foram preenchidos.
+	 *  O único que pode ser nulo é o cargo!
+	 *  @return 'true' se, e somente se, todas as identificações obrigatórias de coluna foram devidamente preenchidas */
+	private boolean validateColumns() {
+		
+		final String[] columns = utilGetColumnsFromTable();
+
+		for (int i=0; i<ITENS; i++)
+			
+			if (i != 4 && columns[i] == null)
+				return false;
+		
+		return true;
 		
 	}
 	
@@ -413,53 +475,7 @@ public class RecursosGUI extends JFrame {
 	
 
 	
-	/** Atualiza a tabela com as configurações do arquivo de propriedades */
-	private void action_update_table() {
-
-		// Recuperando o concurso selecionado
-		//this.concursoAtual = TipoConcurso.valueOf(comboTipo.getSelectedItem().toString());
-		
-		try {
-			
-			// Recuperando as colunas e dados
-			String[] columnNames = this.concursoAtual.getColumnNames();
-			String[] columns     = PropertiesManager.getStringArray(this.concursoAtual.getColumns(),null);
-			
-			// Simples tratamento de erros
-			if (columnNames.length != columns.length) {
-				
-				AlertDialog.error(this, "Configuração de Planilhas","Configuração inválida, favor conferir arquivo de propriedades");
-				return;
-				
-			}
-			
-			// Limpa os dados da tabela
-			TableUtils.clear(modelPlanilha);
-			
-			// Preenche a tabela com os dados carregados do arquivo de propriedades
-			for (int i=0; i<columns.length; i++)
-				modelPlanilha.addRow(new Object[]{ i+1, columnNames[i], columns[i] });		// | # | Item | Coluna |
-			
-		}
-		catch (Exception exception) {
-			exception.printStackTrace();
-		}
-		finally {
-			
-			// Atualizando a quantidade de itens carregados
-			
-		}
-		
-	}
 	
-	/** Inicializa o combo de tipos de concurso */
-	private void init_load_combo() {
-		
-		/*for (TipoConcurso concurso: TipoConcurso.values())
-			comboTipo.addItem(concurso.name());*/
-		
-	}
-
 	
 	private void log(final String format, final Object... args) {
 		
@@ -658,7 +674,7 @@ public class RecursosGUI extends JFrame {
 				buttonOrigem.setEnabled(editable);
 				buttonDestino.setEnabled(editable);
 				
-				buttonProcessar.setEnabled(editable);
+				buttonExport.setEnabled(editable);
 				
 			});
 			
@@ -744,5 +760,4 @@ public class RecursosGUI extends JFrame {
 		}
 		
 	}
-	
 }

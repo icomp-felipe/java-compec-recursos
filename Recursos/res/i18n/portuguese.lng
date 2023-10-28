@@ -12,7 +12,19 @@ hint-button-destino = Seleciona a pasta de saída das respostas aos recursos (em
 
 hint-text-console = Informações de processamento
 
+hint-button-parse  = Analisa as planilhas de entrada
+hint-button-export = Cria e exporta respostas aos recursos para PDF
+
+########## Mensagens de erro da API MFV
+rui-mfv-columnsOk = Verifique se todas as colunas foram preenchidas na tabela
+rui-mfv-sourcedir = A pasta de origem de planilhas não foi selecionada
+
 ########## Métodos
+! RecursosUI::actionParse
+rui-parse-errors = Existem algumas pendências impedindo a análise de prosseguir:\n\
+                   \n\
+                   %s
+
 ! RecursosUI::utilLoadProperty
 rui-load-prop-error = Falha ao carregar a configuração de colunas!\n\
                       Verifique o console para mais informações.
