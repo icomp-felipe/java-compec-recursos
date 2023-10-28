@@ -1,4 +1,4 @@
-package compec.ufam.recursos;
+package compec.ufam.recursos.io;
 
 import java.io.*;
 import java.text.*;

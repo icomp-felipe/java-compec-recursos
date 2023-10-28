@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.apache.poi.ss.util.CellReference;
 
-import compec.ufam.recursos.ExcelReader;
 import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Recurso2;
 

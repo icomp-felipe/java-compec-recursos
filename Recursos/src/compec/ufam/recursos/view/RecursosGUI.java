@@ -29,10 +29,10 @@ import com.phill.libs.mfvapi.MandatoryFieldsLogger;
 import com.phill.libs.mfvapi.MandatoryFieldsManager;
 import com.phill.libs.table.JTableMouseListener;
 
-import compec.ufam.recursos.ExcelReader;
 import compec.ufam.recursos.ListParser;
 import compec.ufam.recursos.ListSorter;
 import compec.ufam.recursos.io.DirectoryParser;
+import compec.ufam.recursos.io.ExcelReader;
 import compec.ufam.recursos.io.PDFWriter;
 import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Fields;
