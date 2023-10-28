@@ -32,7 +32,7 @@ public class Recurso2 {
 		return inscricao;
 	}
 	
-	public int getQuestao() {
+	public Integer getQuestao() {
 		return questao;
 	}
 	
