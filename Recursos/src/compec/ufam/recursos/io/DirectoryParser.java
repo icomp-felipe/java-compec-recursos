@@ -11,18 +11,18 @@ import org.apache.poi.ss.util.CellReference;
 
 import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Recurso2;
+import compec.ufam.recursos.view.RecursosGUI;
 
 public class DirectoryParser {
 
-	public static Map<File, List<Recurso2>> parse(final File directory, final String[] columns) throws IOException {
+	public static Map<File, List<Recurso2>> parse(final File directory, final String[] columns, final RecursosGUI ui) throws IOException {
 		
 		final Map<File, List<Recurso2>> mapaRecursos = new LinkedHashMap<File, List<Recurso2>>();
 		final Integer[] indexes = utilGetExcelIndexes(columns);
 		
 		Files.walk(directory.toPath())
-        	 .parallel()
         	 .filter (path -> path.toFile().isFile() && path.toFile().getName().endsWith("xlsx"))
-        	 .forEach(path -> mapaRecursos.put(path.toFile(), ExcelReader.read(path.toFile(), indexes)));
+        	 .forEach(path -> mapaRecursos.put(path.toFile(), ExcelReader.read(path.toFile(), indexes, ui)));
 		
 		return mapaRecursos;
 	}

@@ -2,28 +2,38 @@ package compec.ufam.recursos.io;
 
 import java.io.*;
 import java.text.*;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
+
+import com.phill.libs.*;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
-import com.phill.libs.StringUtils;
-import com.phill.libs.time.PhillsDateParser;
+import compec.ufam.recursos.RecursoParser;
+import compec.ufam.recursos.model.*;
+import compec.ufam.recursos.view.RecursosGUI;
 
-import compec.ufam.recursos.model.Fields;
-import compec.ufam.recursos.model.Recurso2;
-
+/** Implementa os métodos de extração de recursos de uma planilha do Excel.
+ *  @author Felipe André - felipeandre.eng@gmail.com
+ *  @version 3.0, 28/OUT/2023 */
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	private static final DataFormatter    DATA_FORMATTER = new DataFormatter(Locale.getDefault());
 	
-	public static List<Recurso2> read(final File planilha, final Integer[] indexes) {
+	/** Realiza a leitura da planilha e extrai os dados para uma lista de recursos.
+	 *  @param planilha - planilha de dados
+	 *  @param indexes - índices das colunas
+	 *  @return Lista com todos os recursos contidos na planilha, ou 'null' se ocorrer alguma exceção ou se a planilha não estiver no formato certo. */
+	public static List<Recurso2> read(final File planilha, final Integer[] indexes, final RecursosGUI ui) {
 		
 		// Instanciando a lista de recursos
 		final List<Recurso2> listaRecursos = new ArrayList<Recurso2>();
 		
 		try {
+			
+			ui.log("Processando planilha '%s'", planilha.getName());
 			
 			// Abrindo a planilha para leitura
 			FileInputStream stream    = new FileInputStream(planilha);
@@ -31,43 +41,46 @@ public class ExcelReader {
 			XSSFSheet sheet           = workbook.getSheetAt(0);
 			Iterator<Row> rowIterator = sheet.iterator();
 			
-			// Pulando o cabeçalho
-			if (!parseHeader(rowIterator.next(), indexes)) {
-				
-				System.err.println("Arquivo fora de formato: " + planilha.getName());
-				
-				workbook.close();
-				return null;
-				
-			}
+			// Analisando o cabeçalho, caso seja diferente do declarado em 'Fields' a leitura é encerrada por aqui
+			if (!parseHeader(rowIterator.next(), indexes))
+				ui.error("Arquivo fora de formato!");
 			
-			// Varrendo as linhas da planilha...
-			while (rowIterator.hasNext()) {
-								
-				Row row = rowIterator.next();
+			// Caso o cabeçalho seja válido, é iniciada a extração dos dados a partir das linhas da planilha
+			else {
+				
+				while (rowIterator.hasNext()) {
+									
+					Row row = rowIterator.next();
 
-				if (isEmptyRow(row)) break;
-				
-				final Recurso2 recurso = new Recurso2();
-				
-				// Carregando os dados de um recurso da linha atual da planilha
-				recurso.setNomeCandidato(getNome(row, indexes));
-				recurso.setDataRecurso(getDataRecurso(row, indexes));
-				recurso.setInscricao(getInscricao(row, indexes));
-				recurso.setCpfCandidato(getCPF(row, indexes));
-				recurso.setObjeto(getCargo(row, indexes));
-				recurso.setDisciplina(getDisciplina(row, indexes));
-				recurso.setQuestao(getQuestao(row, indexes));
-				recurso.setQuestionamentoCandidato(getQuestionamento(row, indexes));
-				recurso.setAlteracaoCandidato(getRecurso(row, indexes));
-				recurso.setAnexoCandidato(getAnexos(row, indexes));
-				recurso.setParecerBanca(getParecer(row, indexes));
-				recurso.setRespostaBanca(getDecisao(row, indexes));
-				
-				listaRecursos.add(recurso);
+					// Encerra a leitura quando encontra a primeira linha em branco
+					if (isEmptyRow(row)) break;
+					
+					// Carregando os dados de um recurso da linha atual da planilha
+					final Recurso2 recurso = new Recurso2();
+					
+					recurso.setNomeCandidato (getNomeCandidato (row, indexes));
+					recurso.setDataRecurso   (getDataRecurso   (row, indexes));
+					recurso.setInscricao     (getInscricao     (row, indexes));
+					recurso.setCPFCandidato  (getCPFCandidato  (row, indexes));
+					recurso.setObjeto        (getObjeto        (row, indexes));
+					recurso.setDisciplina    (getDisciplina    (row, indexes));
+					recurso.setQuestao       (getQuestao       (row, indexes));
+					recurso.setQuestionamento(getQuestionamento(row, indexes));
+					recurso.setRecurso       (getRecurso       (row, indexes));
+					recurso.setAnexoCandidato(getAnexoCandidato(row, indexes));
+					recurso.setParecerBanca  (getParecerBanca  (row, indexes));
+					recurso.setRespostaBanca (getDecisaoBanca  (row, indexes));
+					
+					// Realizando validação dos dados
+					RecursoParser.parse(recurso, row, ui);
+					
+					listaRecursos.add(recurso);
+					
+				}
 				
 			}
 			
+			// Fechando a planilha
 			workbook.close();
 			
 		}
@@ -80,6 +93,8 @@ public class ExcelReader {
 		
 		return listaRecursos;
 	}
+	
+	/************************* Bloco de Métodos Utilitários *******************************/
 	
 	/** Verifica se uma linha da planilha é vazia.
 	 *  @param row - linha da planilha
@@ -113,8 +128,12 @@ public class ExcelReader {
 		return true;
 	}
 	
-	/****************** Bloco de Extração de Dados da Planilha *****************/
+	/*********************** Bloco de Extração de Dados da Planilha ***********************/
 	
+	/** Extrai a data de envio do recurso.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Data de envio do recurso. */
 	private static LocalDateTime getDataRecurso(final Row row, final Integer[] indexes) {
 		
 		final Cell cell = row.getCell( indexes[Fields.TIMESTAMP.getIndex()] );
@@ -122,15 +141,19 @@ public class ExcelReader {
 		return cell == null ? null : cell.getLocalDateTimeCellValue();
 	}
 	
-	/** @return Nome do candidato.
-	 *  @param row - linha da planilha */
-	private static String getNome(final Row row, final Integer[] indexes) {
+	/** Extrai o nome do candidato.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Nome do candidato. */
+	private static String getNomeCandidato(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.NOME.getIndex()] ));
 	}
 	
-	/** @return CPF do candidato.
-	 *  @param row - linha da planilha */
-	private static String getCPF(final Row row, final Integer[] indexes) {
+	/** Extrai o número de CPF do candidato.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return String representando o número de CPF do candidato. */
+	private static String getCPFCandidato(final Row row, final Integer[] indexes) {
 		
 		final Cell cell = row.getCell( indexes[Fields.CPF.getIndex()] );
 		String rawData = StringUtils.extractNumbers(getCellContent(cell));
@@ -138,6 +161,10 @@ public class ExcelReader {
 		return rawData == null ? null : String.format("%011d", Long.parseLong(rawData));
 	}
 	
+	/** Extrai o número de inscrição do candidato.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Número de inscrição do candidato. */
 	private static Integer getInscricao(final Row row, final Integer[] indexes) {
 		
 		try { return Integer.parseInt( getCellContent(row.getCell( indexes[Fields.INSCRICAO.getIndex()] )) );	}
@@ -145,7 +172,11 @@ public class ExcelReader {
 		
 	}
 	
-	private static String getCargo(final Row row, final Integer[] indexes) {
+	/** Extrai objeto de execução do concurso (cargo ou 'null', no caso dos processos seletivos para graduação).
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Objeto de execução do concurso. */
+	private static String getObjeto(final Row row, final Integer[] indexes) {
 		
 		final Integer index = indexes[Fields.CARGO.getIndex()];
 		
@@ -153,10 +184,18 @@ public class ExcelReader {
 		
 	}
 	
+	/** Extrai a disciplina recursada.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Disciplina recursada. */
 	private static String getDisciplina(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.DISCIPLINA.getIndex()] ));
 	}
 	
+	/** Extrai o número da questão recursada.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Número da questão recursada. */
 	private static Integer getQuestao(final Row row, final Integer[] indexes) {
 		
 		try { return Integer.parseInt( getCellContent(row.getCell( indexes[Fields.QUESTAO.getIndex()] )) );	}
@@ -164,23 +203,43 @@ public class ExcelReader {
 		
 	}
 	
+	/** Extrai o questionamento do candidato.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Questionamento do candidato. */
 	private static String getQuestionamento(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.QUESTIONAMENTO.getIndex()] ));
 	}
 	
-	private static String getAnexos(final Row row, final Integer[] indexes) {
+	/** Extrai o link de anexo de recurso do candidato.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Link de anexo de recurso do candidato. */
+	private static String getAnexoCandidato(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.ANEXOS.getIndex()] ));
 	}
 	
+	/** Extrai o recurso do candidato (solicitação de alteração de gabarito).
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Recurso do candidato. */
 	private static String getRecurso(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.RECURSO.getIndex()] ));
 	}
 	
-	private static String getParecer(final Row row, final Integer[] indexes) {
+	/** Extrai o parecer da banca examinadora.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Parecer da banca examinadora. */
+	private static String getParecerBanca(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.PARECER.getIndex()] ));
 	}
 	
-	private static String getDecisao(final Row row, final Integer[] indexes) {
+	/** Extrai a decisão da banca examinadora.
+	 *  @param row - linha da planilha
+	 *  @param indexes - índices das colunas
+	 *  @return Decisão da banca examinadora. */
+	private static String getDecisaoBanca(final Row row, final Integer[] indexes) {
 		return getCellContent(row.getCell( indexes[Fields.DECISAO.getIndex()] ));
 	}
 	

@@ -479,7 +479,7 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			utilLockParseUI(true);
-			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable());
+			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable(), this);
 			
 		} catch (Exception exception) {
 			
@@ -526,19 +526,19 @@ public class RecursosGUI extends JFrame {
 	
 	
 	
-	private void log(final String format, final Object... args) {
+	public synchronized void log(final String format, final Object... args) {
 		
 		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[INFO] " + format + "\n", args)));
 		
 	}
 	
-	private void warning(final String format, final Object... args) {
+	public synchronized void warning(final String format, final Object... args) {
 		
 		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[ATENÇÃO] " + format + "\n", args)));
 		
 	}
 	
-	private void error(final String format, final Object... args) {
+	public synchronized void error(final String format, final Object... args) {
 		
 		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[ERRO] " + format + "\n", args)));
 		
