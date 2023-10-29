@@ -1,17 +1,25 @@
 package compec.ufam.recursos;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
-import compec.ufam.recursos.model.Recurso;
-import compec.ufam.recursos.model.Recurso2;
+import compec.ufam.recursos.view.*;
+import compec.ufam.recursos.model.*;
 
 public class ListParser {
 
+	public static void parse(List<Recurso2> listaRecursos, final RecursosGUI ui) {
+		
+		// Verificando se existem diferentes disciplinas
+		Map<String, Recurso2> mapaDisciplinas = listaRecursos.stream().collect(Collectors.toMap(Recurso2::getDisciplina, recurso -> recurso, (recurso1, recurso2) -> recurso1));
+		
+		if (mapaDisciplinas.size() > 1)
+			ui.warning("Existem %d disciplinas no mesmo arquivo: %s", mapaDisciplinas.size(), Arrays.toString(mapaDisciplinas.keySet().toArray()));
+		
+		
+		
+	}
+	
 	public static void gabarito(List<Recurso2> listaRecursos) {
 		
 		/*Map<Object, Map<String, String>> mapao =

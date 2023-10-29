@@ -83,7 +83,7 @@ public class ExcelReader {
 			// Fechando a planilha
 			workbook.close();
 			
-			ListParser.gabarito(listaRecursos);
+			ListParser.parse(listaRecursos, ui);
 			
 		}
 		catch (Exception exception) {
