@@ -85,7 +85,7 @@ public class ExcelReader {
 			
 			// Realizando validação geral dos dados
 			ListParser.parse   (listaRecursos, ui);
-			ListParser.gabarito(listaRecursos);
+			ListParser.gabarito(listaRecursos, planilha);
 			
 		}
 		catch (Exception exception) {
