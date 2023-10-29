@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.*;
 
+import org.apache.commons.io.FilenameUtils;
+
 import compec.ufam.recursos.view.*;
 import compec.ufam.recursos.model.*;
 
@@ -46,10 +48,7 @@ public class ListParser {
 	public static String gabarito(List<Recurso2> listaRecursos, File planilha) {
 
 		// Calculando o título do objeto
-		final String objeto = listaRecursos.getFirst().getObjeto();
-		final String titulo = (objeto == null) ? planilha.getName() : objeto;
-		
-		final StringBuilder builder = new StringBuilder("==> " + titulo + "\n\n");
+		final StringBuilder builder = new StringBuilder("==> " + FilenameUtils.removeExtension(planilha.getName()) + "\n\n");
 		
 		// Filtra a lista por questão e decisão da banca
 		Map<Integer, Map<String, Recurso2>> filtroQuestaoDecisao = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso2::getQuestao, LinkedHashMap::new, Collectors.toMap(Recurso2::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1)));
@@ -59,9 +58,11 @@ public class ListParser {
 			
 			Map<String, Recurso2> mapaDecisoes = mapaQuestaoDecisoes.getValue();
 
-			builder.append(String.format("Questão %d: %s\n", mapaQuestaoDecisoes.getKey(), mapaDecisoes.keySet()));
+			builder.append(String.format("Questão %02d: %s\n", mapaQuestaoDecisoes.getKey(), mapaDecisoes.keySet()));
 			
 		}
+		
+		System.out.println(builder.toString());
 		
 		return builder.toString();
 		

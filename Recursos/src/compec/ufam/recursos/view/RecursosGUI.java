@@ -1,6 +1,7 @@
 package compec.ufam.recursos.view;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -24,6 +25,7 @@ import javax.swing.text.StyledDocument;
 import com.phill.libs.ui.AlertDialog;
 import com.phill.libs.ui.ESCDispose;
 import com.phill.libs.ui.GraphicsHelper;
+import com.phill.libs.ui.ShortcutAction;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.phill.libs.PropertiesManager;
 import com.phill.libs.ResourceManager;
@@ -270,6 +272,8 @@ public class RecursosGUI extends JFrame {
 		buttonExport.setBounds(760, 683, 30, 25);
 		getContentPane().add(buttonExport);
 		
+		createPopupMenu();
+		
 		utilLoadProperty();
 		
 		// Cadastrando validação de campos
@@ -279,11 +283,38 @@ public class RecursosGUI extends JFrame {
 		fieldValidator.addPermanent(labelOrigem , () -> sourceDir != null, bundle.getString("rui-mfv-sourcedir"), false);
 		fieldValidator.addPermanent(new JLabel(), () -> validateColumns(), bundle.getString("rui-mfv-columnsOk"), false);
 		
-		setSize(800, 720);
+		setSize(800, 750);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
+		
+	}
+	
+	private void createPopupMenu() {
+
+		JPopupMenu popupMenu = new JPopupMenu();
+		
+		// Definindo aceleradores
+		KeyStroke limpar = KeyStroke.getKeyStroke(KeyEvent.VK_L, 0);
+		
+		// Definindo ações dos itens de menu
+		Action actionLimpar = new ShortcutAction("Limpar", KeyEvent.VK_L, limpar,(event) -> textConsole.setText(null));
+		
+		// Declarando os itens de menu
+		JMenuItem itemLimpar = new JMenuItem(actionLimpar);
+		popupMenu.add(itemLimpar);
+		
+		// Definindo atalhos de teclado
+		final InputMap  imap = textConsole.getInputMap (JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		final ActionMap amap = textConsole.getActionMap();
+					
+		imap.put(limpar, "actionLimpar");
+		
+		amap.put("actionLimpar", actionLimpar);
+		
+		// Atribuindo menu à tabela
+		textConsole.setComponentPopupMenu(popupMenu);
 		
 	}
 	
