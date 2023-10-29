@@ -1,4 +1,4 @@
-package compec.ufam.recursos;
+package compec.ufam.recursos.parser;
 
 import com.phill.libs.br.*;
 
@@ -9,7 +9,7 @@ import org.apache.poi.ss.usermodel.*;
 import compec.ufam.recursos.view.*;
 import compec.ufam.recursos.model.*;
 
-/** Implementa os verificadores de integridade dos dados de um {@link Recurso2}.
+/** Implementa os verificadores de integridade dos dados de um {@link Recurso}.
  *  @author Felipe André - felipeandre.eng@gmail.com
  *  @version 3.0, 29/OUT/2023 */
 public class RecursoParser {
@@ -18,7 +18,7 @@ public class RecursoParser {
 	 *  @param recurso - recurso
 	 *  @param row - linha da planilha de onde foi extraído o recurso
 	 *  @param ui - interface gráfica principal, para exibição de resultados */
-	public static void parse(final Recurso2 recurso, final Row row, final RecursosGUI ui) {
+	public static void parse(final Recurso recurso, final Row row, final RecursosGUI ui) {
 		
 		final int linha = row.getRowNum() + 1;
 		
@@ -78,7 +78,7 @@ public class RecursoParser {
 	 *  @return Array com dois inteiros, sendo o primeiro representando o número de questão
 	 *  inicial e o segundo, o número da última questão contemplada pela disciplina do <code>recurso</code>,
 	 *  ou 'null' caso não seja possível extrair os dois números a partir do <code>recurso</code>. */
-	private static Integer[] getInterval(final Recurso2 recurso) {
+	private static Integer[] getInterval(final Recurso recurso) {
 		
 		if (recurso != null) {
 			

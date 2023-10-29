@@ -6,27 +6,27 @@ import javax.imageio.*;
 import java.awt.image.*;
 import com.phill.libs.*;
 
-import compec.ufam.recursos.model.Recurso;
-import compec.ufam.recursos.model.TipoConcurso;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.*;
 import net.sf.jasperreports.engine.util.*;
 import net.sf.jasperreports.view.*;
 
+import compec.ufam.recursos.model.*;
+
 public class PDFWriter {
 	
-	public static void export(String edital, String data_publicacao, TipoConcurso concurso, ArrayList<Recurso> listaRecursos, File arquivo) throws Exception {
+	public static void export(String edital, String data_publicacao, ArrayList<Recurso> listaRecursos, File arquivo) throws Exception {
 		
 		/** Inflando o relatório */
-		JasperPrint  prints = prepare(edital, data_publicacao, concurso, listaRecursos);
+		JasperPrint  prints = prepare(edital, data_publicacao, listaRecursos);
 		JasperExportManager.exportReportToPdfFile(prints, arquivo.getAbsolutePath());
 		
 	}
 	
-	public static void show(String edital, String data_publicacao, TipoConcurso concurso, ArrayList<Recurso> listaRecursos) throws Exception {
+	public static void show(String edital, String data_publicacao, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		/** Inflando o relatório */
-		JasperPrint  prints = prepare(edital, data_publicacao, concurso, listaRecursos);
+		JasperPrint  prints = prepare(edital, data_publicacao, listaRecursos);
 		
 		/** Enfeitando a visualização do Jasper */
 		JasperViewer jrv = new JasperViewer(prints,false);
@@ -35,10 +35,10 @@ public class PDFWriter {
 		
 	}
 	
-	private static JasperPrint prepare(String edital, String data_publicacao, TipoConcurso concurso, ArrayList<Recurso> listaRecursos) throws Exception {
+	private static JasperPrint prepare(String edital, String data_publicacao, ArrayList<Recurso> listaRecursos) throws Exception {
 		
 		/** Leitura dos arquivos */
-		File     reportPath = concurso.getReport();
+		File     reportPath = new File("");
 		BufferedImage  logo = ImageIO.read(ResourceManager.getResourceAsFile("img/logo.jpg"));
 		JasperReport report = (JasperReport) JRLoader.loadObject(reportPath);
 		

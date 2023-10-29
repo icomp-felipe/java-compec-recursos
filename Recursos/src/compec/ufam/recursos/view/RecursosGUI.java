@@ -35,16 +35,13 @@ import com.phill.libs.mfvapi.MandatoryFieldsLogger;
 import com.phill.libs.mfvapi.MandatoryFieldsManager;
 import com.phill.libs.table.JTableMouseListener;
 
-import compec.ufam.recursos.ListParser;
-import compec.ufam.recursos.ListSorter;
-import compec.ufam.recursos.io.DirectoryParser;
 import compec.ufam.recursos.io.ExcelReader;
 import compec.ufam.recursos.io.PDFWriter;
 import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Fields;
 import compec.ufam.recursos.model.Recurso;
-import compec.ufam.recursos.model.Recurso2;
-import compec.ufam.recursos.model.TipoConcurso;
+import compec.ufam.recursos.parser.DirectoryParser;
+import compec.ufam.recursos.parser.ListParser;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
 /** Implementa a interface gráfica do sistema.
@@ -76,9 +73,6 @@ public class RecursosGUI extends JFrame {
 	private static final int excelColumnID = 2;
 	
 	private int dir_proc, fil_proc;
-	
-	private ReportGenerator threadReports;
-    private TipoConcurso concursoAtual;
 	
 	// Carregando bundle de idiomas
 	private final static PropertyBundle bundle = new PropertyBundle("i18n/portuguese", null);
@@ -320,7 +314,7 @@ public class RecursosGUI extends JFrame {
 	
 	/******************** Bloco de Tratamento de Eventos de Botões *************************/
 	
-	private Map<File, List<Recurso2>> mapaRecursos;
+	private Map<File, List<Recurso>> mapaRecursos;
 	
 	/** Carrega e analisa todas as planilhas do diretório informado. */
 	private void actionParse() {
@@ -545,25 +539,6 @@ public class RecursosGUI extends JFrame {
 	/** Valida os dados da tela e, se tudo estiver certo, inicia a geração de relatórios */
 	private void action_proccess() {
 		
-		// Recuperando os dados da tela
-		String    edital = textEdital.getText().trim();
-		String      data = null; //data_realizacao.getJFormattedTextField().getText();
-		
-		// Se os dados da tela são válidos, inicio os trabalhos
-		if (util_parse_view(edital,data)) {
-			
-			try {
-				
-				this.threadReports = new ReportGenerator(edital,data);
-				this.threadReports.setName("Thread de geração de relatórios");
-				this.threadReports.start();
-				
-			}
-			catch (Exception exception) {
-				exception.printStackTrace();
-			}
-			
-		}
 		
 	}
 	
@@ -634,183 +609,6 @@ public class RecursosGUI extends JFrame {
 	
 	
 	
-
-	
-	
-	private class ReportGenerator extends Thread {
-		
-		private final String edital, data;
-		private final String[] colunas;
-		
-		public ReportGenerator(String edital, String data) throws IOException {
-			
-			this.edital  = edital;
-			this.data    = data;
-			this.colunas = PropertiesManager.getStringArray(concursoAtual.getColumns(),null);
-			
-		}
-		
-		@Override
-		public void run() {
-			
-			// Bloqueando os campos da tela contra edição
-			util_lock_fields(true);
-			
-			// Variáveis de controle da view
-			boolean status, success = true;
-			dir_proc = fil_proc = 0;
-			
-			// Atualizando a view
-			//SwingUtilities.invokeLater(() -> labelLoading.setVisible(true));
-			
-			// Se o diretório de origem for legível...
-			if (sourceDir.canRead()) {
-				
-				// ...vou varrendo-o...
-				for (File sub_dir: sourceDir.listFiles()) {
-					
-					// ...em busca de subdiretórios acessíveis...
-					if (sub_dir.isDirectory() && sub_dir.canRead()) {
-						
-						// ...e, processando estes subdiretórios
-						dir_proc++;
-						status = core_parse_dir(sub_dir);
-							
-						// Caso dê alguma falha no processamento do subdiretório, sinalizo nesta variável
-						if (!status)
-							success = false;
-							
-					}
-				}
-			}
-			
-			// Atualizando a view
-			String message = (success) ? "Tudo completo!" : "Terminado, mas com algumas falhas (vide console).";
-			SwingUtilities.invokeLater(() -> {
-												//labelLoading.setVisible(false);
-												//textOBS.setText(message);
-												util_lock_fields(false);
-											 });
-			
-		}
-		
-		public boolean core_parse_dir(File dir_planilhas) {
-
-			/******************** Leitura das Planilhas *************************/
-			// Preparando recursos
-			ArrayList<Recurso> listaRecursos = new ArrayList<Recurso>();
-			
-			// Varrendo o diretório...
-			for (File arquivo: dir_planilhas.listFiles()) {
-				
-				// ...em busca de arquivos XLSX legíveis e...
-				if (arquivo.isFile() && arquivo.getName().endsWith(".xlsx")) {
-					
-					// ...tentando ler as planilhas (sempre atualizando a view)
-					try {
-						
-						fil_proc++;
-						util_obs_reading(dir_planilhas,arquivo);
-						
-						//ExcelReader.read(arquivo,this.colunas,listaRecursos);
-						
-					}
-					
-					// Caso dê algum erro, informo apenas no console e sigo o baile
-					catch (Exception exception) {
-						System.err.println("x Falha ao ler a planilha '" + arquivo.getName() + "': " + exception.getMessage());
-						exception.printStackTrace();
-						return false;
-					}
-					
-				}
-				
-			}
-			
-			/********************* Ordenação das Listas *************************/
-			
-			// Atualizando a GUI
-			//SwingUtilities.invokeLater(() -> textOBS.setText("Ordenando recursos"));
-			
-			ArrayList<Recurso> listaOrdenada = ListSorter.sort(listaRecursos);
-			
-			
-			/*********************** Verificação de Dados ***********************/
-			//ListParser.parseIntervalo(listaOrdenada);
-			//ListParser.parseDouble   (listaOrdenada);
-			
-			/************************* Geração de PDF ***************************/
-			
-			// Obtendo o nome do arquivo PDF
-			File pdf = util_pdf_filename(listaOrdenada);
-			
-			// Atualizando a GUI
-			//SwingUtilities.invokeLater(() -> textOBS.setText("Gerando PDF '" + pdf.getName() + "'"));
-			
-			// Exportando o PDF
-			try {
-				PDFWriter.export(this.edital, this.data, concursoAtual, listaOrdenada, pdf);
-			} catch (Exception exception) {
-				System.err.println("x Falha ao gerar o PDF '" + pdf.getName() + "': " + exception.getMessage());
-				exception.printStackTrace();
-				return false;
-			}
-			
-			return true;
-		}
-		
-		/** Formatando string de log (view) */
-		private void util_obs_reading(File dir, File sheet) {
-			
-			//String message = String.format("<html>Processando pasta %d de %d (%s)...<br>Lendo planilha %d de %d (%s)</html>", dir_proc, dir_tot, dir.getName(), fil_proc, fil_tot, sheet.getName());
-			//SwingUtilities.invokeLater(() -> textOBS.setText(message));
-			
-		}
-		
-		/** Bloqueia ou desbloqueia alguns campos da tela contra edição */
-		private void util_lock_fields(boolean lock) {
-			
-			final boolean editable = !lock;
-			
-			SwingUtilities.invokeLater(() -> {
-				
-				textEdital.setEditable(editable);
-				
-				buttonOrigem.setEnabled(editable);
-				buttonDestino.setEnabled(editable);
-				
-				buttonExport.setEnabled(editable);
-				
-			});
-			
-		}
-		
-		/** Recupera o nome do arquivo PDF de saída */
-		private File util_pdf_filename(ArrayList<Recurso> listaRecursos) {
-			
-			
-				
-				// Instanciando meu builder
-				StringBuilder builder = new StringBuilder();
-				
-				// Aqui extraio os cargos diferentes da lista de recursos
-				Map<String,List<Recurso>> map_cargos = listaRecursos.stream().collect(Collectors.groupingBy(Recurso::getCargo));
-				
-				// Nesta etapa faco a ordenacao do Map por ordem crescente de código de cargos
-				Map<String,List<Recurso>> map_cargos_sorted = map_cargos.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,(e1, e2) -> e2, LinkedHashMap::new));
-						
-				// Aqui adiciono todos os códigos de cargos diferentes no builder
-				map_cargos_sorted.forEach((key,value) -> builder.append(key.substring(0,4) + " - "));
-				
-				// Por fim, monto o nome do arquivo com os códigos e nome de cargo + tratamentos de caracteres especiais em nome de arquivo
-				String filename = String.format("%s%s (Todos).pdf",builder.toString(),listaRecursos.get(0).getCargo().substring(7).replace("/"," - ").replace(":"," "));
-
-				return new File(targetDir.getAbsolutePath() + "/" + filename);
-				
-			
-		}
-		
-	}
 	
 	/** Implementa o modelo de dados da tabela de configuração de colunas das planilhas de entrada.
 	 *  @author Felipe André - felipeandre.eng@gmail.com

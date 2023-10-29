@@ -13,6 +13,8 @@ import org.apache.poi.xssf.usermodel.*;
 import compec.ufam.recursos.*;
 import compec.ufam.recursos.view.*;
 import compec.ufam.recursos.model.*;
+import compec.ufam.recursos.parser.ListParser;
+import compec.ufam.recursos.parser.RecursoParser;
 
 /** Implementa os métodos de extração de recursos de uma planilha do Excel.
  *  @author Felipe André - felipeandre.eng@gmail.com
@@ -26,10 +28,10 @@ public class ExcelReader {
 	 *  @param planilha - planilha de dados
 	 *  @param indexes - índices das colunas
 	 *  @return Lista com todos os recursos contidos na planilha, ou 'null' se ocorrer alguma exceção ou se a planilha não estiver no formato certo. */
-	public static List<Recurso2> read(final File planilha, final Integer[] indexes, final RecursosGUI ui) {
+	public static List<Recurso> read(final File planilha, final Integer[] indexes, final RecursosGUI ui) {
 		
 		// Instanciando a lista de recursos
-		final List<Recurso2> listaRecursos = new ArrayList<Recurso2>();
+		final List<Recurso> listaRecursos = new ArrayList<Recurso>();
 		
 		try {
 			
@@ -56,7 +58,7 @@ public class ExcelReader {
 					if (isEmptyRow(row)) break;
 					
 					// Carregando os dados de um recurso da linha atual da planilha
-					final Recurso2 recurso = new Recurso2();
+					final Recurso recurso = new Recurso();
 					
 					recurso.setNomeCandidato (getNomeCandidato (row, indexes));
 					recurso.setDataRecurso   (getDataRecurso   (row, indexes));

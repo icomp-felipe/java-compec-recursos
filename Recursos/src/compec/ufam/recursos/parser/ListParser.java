@@ -1,4 +1,4 @@
-package compec.ufam.recursos;
+package compec.ufam.recursos.parser;
 
 import java.io.File;
 import java.util.*;
@@ -17,10 +17,10 @@ public class ListParser {
 	/** Realiza verificação de duplicidade de decisões pra mesma questão e se há diferentes disciplinas na mesma lista.
 	 *  @param listaRecursos - recursos extraídos da planilha
 	 *  @param ui - interface gráfica principal para exibição de resultados */
-	public static void parse(List<Recurso2> listaRecursos, final RecursosGUI ui) {
+	public static void parse(final List<Recurso> listaRecursos, final RecursosGUI ui) {
 		
 		// Verificando se existem diferentes disciplinas
-		Map<String, Recurso2> mapaDisciplinas = listaRecursos.stream().collect(Collectors.toMap(Recurso2::getDisciplina, recurso -> recurso, (recurso1, recurso2) -> recurso1));
+		Map<String, Recurso> mapaDisciplinas = listaRecursos.stream().collect(Collectors.toMap(Recurso::getDisciplina, recurso -> recurso, (recurso1, recurso2) -> recurso1));
 		
 		if (mapaDisciplinas.size() > 1)
 			ui.warning("Existem %d disciplinas no mesmo arquivo: %s", mapaDisciplinas.size(), Arrays.toString(mapaDisciplinas.keySet().toArray()));
@@ -28,12 +28,12 @@ public class ListParser {
 		// Verificando decisões diferentes pra mesma questão
 		
 		// Agrupando recursos por número de questão 
-		Map<Integer, List<Recurso2>> mapaQuestoes = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso2::getQuestao, LinkedHashMap::new, Collectors.toCollection(ArrayList::new)));
+		Map<Integer, List<Recurso>> mapaQuestoes = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso::getQuestao, LinkedHashMap::new, Collectors.toCollection(ArrayList::new)));
 		
-		for (List<Recurso2> recursosAgrupados: mapaQuestoes.values()) {
+		for (List<Recurso> recursosAgrupados: mapaQuestoes.values()) {
 			
 			// Agrupando recursos por decisão
-			Map<String, Recurso2> mapaDecisoes = recursosAgrupados.stream().collect(Collectors.toMap(Recurso2::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1));
+			Map<String, Recurso> mapaDecisoes = recursosAgrupados.stream().collect(Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1));
 			
 			if (mapaDecisoes.size() > 1)
 				ui.warning("Questão %d possui diferentes decisões: %s", recursosAgrupados.getFirst().getQuestao(), Arrays.toString(mapaDecisoes.keySet().toArray()));
@@ -45,18 +45,18 @@ public class ListParser {
 	/** Imprime o gabarito, calculado a partir da <code>listaRecursos</code>.
 	 *  @param listaRecursos - recursos extraídos da planilha
 	 *  @return String contendo o gabarito processado. */
-	public static String gabarito(List<Recurso2> listaRecursos, File planilha) {
+	public static String gabarito(List<Recurso> listaRecursos, File planilha) {
 
 		// Calculando o título do objeto
 		final StringBuilder builder = new StringBuilder("==> " + FilenameUtils.removeExtension(planilha.getName()) + "\n\n");
 		
 		// Filtra a lista por questão e decisão da banca
-		Map<Integer, Map<String, Recurso2>> filtroQuestaoDecisao = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso2::getQuestao, LinkedHashMap::new, Collectors.toMap(Recurso2::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1)));
+		Map<Integer, Map<String, Recurso>> filtroQuestaoDecisao = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso::getQuestao, LinkedHashMap::new, Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1)));
 
 		// Imprime o gabarito para cada questão
-		for (Map.Entry<Integer, Map<String, Recurso2>> mapaQuestaoDecisoes: filtroQuestaoDecisao.entrySet()) {
+		for (Map.Entry<Integer, Map<String, Recurso>> mapaQuestaoDecisoes: filtroQuestaoDecisao.entrySet()) {
 			
-			Map<String, Recurso2> mapaDecisoes = mapaQuestaoDecisoes.getValue();
+			Map<String, Recurso> mapaDecisoes = mapaQuestaoDecisoes.getValue();
 
 			builder.append(String.format("Questão %02d: %s\n", mapaQuestaoDecisoes.getKey(), mapaDecisoes.keySet()));
 			

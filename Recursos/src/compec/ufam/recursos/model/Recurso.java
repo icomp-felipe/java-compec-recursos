@@ -5,7 +5,7 @@ import java.time.*;
 /** Modelagem de um recurso.
  *  @author Felipe André - felipeandre.eng@gmail.com
  *  @version 3.0, 29/OUT/2023 */
-public class Recurso2 {
+public class Recurso {
 
 	private LocalDateTime dataRecurso;
 	private String nomeCandidato, cpfCandidato;

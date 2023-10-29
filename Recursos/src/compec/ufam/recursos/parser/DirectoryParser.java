@@ -1,23 +1,20 @@
-package compec.ufam.recursos.io;
+package compec.ufam.recursos.parser;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
+import java.nio.file.*;
 
-import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.ss.util.*;
 
-import compec.ufam.recursos.model.Constants;
-import compec.ufam.recursos.model.Recurso2;
-import compec.ufam.recursos.view.RecursosGUI;
+import compec.ufam.recursos.io.*;
+import compec.ufam.recursos.view.*;
+import compec.ufam.recursos.model.*;
 
 public class DirectoryParser {
 
-	public static Map<File, List<Recurso2>> parse(final File directory, final String[] columns, final RecursosGUI ui) throws IOException {
+	public static Map<File, List<Recurso>> parse(final File directory, final String[] columns, final RecursosGUI ui) throws IOException {
 		
-		final Map<File, List<Recurso2>> mapaRecursos = new LinkedHashMap<File, List<Recurso2>>();
+		final Map<File, List<Recurso>> mapaRecursos = new LinkedHashMap<File, List<Recurso>>();
 		final Integer[] indexes = utilGetExcelIndexes(columns);
 		
 		Files.walk(directory.toPath())
