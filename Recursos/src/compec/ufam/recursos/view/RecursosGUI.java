@@ -681,7 +681,7 @@ public class RecursosGUI extends JFrame {
 			
 			/*********************** Verificação de Dados ***********************/
 			//ListParser.parseIntervalo(listaOrdenada);
-			ListParser.parseDouble   (listaOrdenada);
+			//ListParser.parseDouble   (listaOrdenada);
 			
 			/************************* Geração de PDF ***************************/
 			

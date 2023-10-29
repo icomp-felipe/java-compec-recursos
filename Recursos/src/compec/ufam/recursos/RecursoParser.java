@@ -68,7 +68,7 @@ public class RecursoParser {
 			ui.warning("Linha %d: Parecer de banca vazio", linha);
 		
 		// Validação da decisão da banca examinadora
-		if (recurso.getRespostaBanca() == null || recurso.getRespostaBanca().isBlank())
+		if (recurso.getDecisaoBanca() == null || recurso.getDecisaoBanca().isBlank())
 			ui.warning("Linha %d: Decisão de banca vazia", linha);
 		
 	}

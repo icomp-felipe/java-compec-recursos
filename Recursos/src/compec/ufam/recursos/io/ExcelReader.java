@@ -69,7 +69,7 @@ public class ExcelReader {
 					recurso.setRecurso       (getRecurso       (row, indexes));
 					recurso.setAnexoCandidato(getAnexoCandidato(row, indexes));
 					recurso.setParecerBanca  (getParecerBanca  (row, indexes));
-					recurso.setRespostaBanca (getDecisaoBanca  (row, indexes));
+					recurso.setDecisaoBanca  (getDecisaoBanca  (row, indexes));
 					
 					// Realizando validação dos dados
 					RecursoParser.parse(recurso, row, ui);
@@ -83,7 +83,9 @@ public class ExcelReader {
 			// Fechando a planilha
 			workbook.close();
 			
-			ListParser.parse(listaRecursos, ui);
+			// Realizando validação geral dos dados
+			ListParser.parse   (listaRecursos, ui);
+			ListParser.gabarito(listaRecursos);
 			
 		}
 		catch (Exception exception) {

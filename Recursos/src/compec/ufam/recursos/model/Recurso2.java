@@ -14,6 +14,11 @@ public class Recurso2 {
 	private String questionamento, anexoCandidato, recurso;
 	private String parecerBanca, decisaoBanca;
 	
+	@Override
+	public String toString() {
+		return String.format("Questão %d: %s", questao, decisaoBanca);
+	}
+	
 	/************************ Bloco de Getters **************************/
 	
 	/** @return Data de envio do recurso. */
@@ -72,7 +77,7 @@ public class Recurso2 {
 	}
 	
 	/** @return Decisão da banca examinadora. */
-	public String getRespostaBanca() {
+	public String getDecisaoBanca() {
 		return this.decisaoBanca;
 	}
 	
@@ -146,7 +151,7 @@ public class Recurso2 {
 	
 	/** Setter da decisão da banca examinadora.
 	 *  @param decisaoBanca - decisão da banca examinadora */
-	public void setRespostaBanca(String decisaoBanca) {
+	public void setDecisaoBanca(String decisaoBanca) {
 		this.decisaoBanca = decisaoBanca;
 	}
 	
