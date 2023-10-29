@@ -1,212 +1,158 @@
 package compec.ufam.recursos.model;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.*;
 
-import com.phill.libs.StringUtils;
+/** Modelagem de um recurso.
+ *  @author Felipe André - felipeandre.eng@gmail.com
+ *  @version 3.0, 29/OUT/2023 */
+public class Recurso2 {
 
-/** Implementa a modelagem de um recurso
- *  @author Felipe André
- *  @version 2.0, 10/12/2019 */
-public class Recurso {
+	private LocalDateTime dataRecurso;
+	private String nomeCandidato, cpfCandidato;
+	private Integer inscricao, questao;
+	private String objeto, disciplina;
+	private String questionamento, anexoCandidato, recurso;
+	private String parecerBanca, decisaoBanca;
 	
-	/** Atributo útil para debug de erros de processamento de planilha */
-	private final int linha_excel;
-	private final String planilha;
-
-	private String disciplina;
-	private int num_questao;
+	@Override
+	public String toString() {
+		return String.format("Questão %d: %s", questao, decisaoBanca);
+	}
 	
-	private String nome_interessado;
+	/************************ Bloco de Getters **************************/
 	
-	private String questionamento, alteracao;
-	private String parecer, resposta;
+	/** @return Data de envio do recurso. */
+	public LocalDateTime getDataRecurso() {
+		return this.dataRecurso;
+	}
 	
-	private String cargo;
+	/** @return Nome do candidato. */
+	public String getNomeCandidato() {
+		return this.nomeCandidato;
+	}
 	
-	/** Construtor apenas seta a linha da planilha de onde estão vindo os dados */
-	public Recurso(int linha_excel, String planilha) {
-		this.linha_excel = linha_excel;
-		this.planilha = planilha;
+	/** @return Número de CPF do candidato. */
+	public String getCPFCandidato() {
+		return this.cpfCandidato;
+	}
+	
+	/** @return Número de inscrição do candidato. */
+	public Integer getInscricao() {
+		return this.inscricao;
+	}
+	
+	/** @return Número da questão recursada. */
+	public Integer getQuestao() {
+		return this.questao;
+	}
+	
+	/** @return Objeto de execução do concurso (cargo ou 'null', no caso dos processos seletivos para graduação). */
+	public String getObjeto() {
+		return this.objeto;
+	}
+	
+	/** @return Disciplina recursada. */
+	public String getDisciplina() {
+		return this.disciplina;
+	}
+	
+	/** @return Questionamento do candidato. */
+	public String getQuestionamento() {
+		return this.questionamento;
+	}
+	
+	/** @return Link de anexo de recurso do candidato. */
+	public String getAnexoCandidato() {
+		return this.anexoCandidato;
 	}
 
+	/** @return Recurso do candidato (solicitação de alteração de gabarito). */
+	public String getRecurso() {
+		return this.recurso;
+	}
+	
+	/** @return Parecer da banca examinadora. */
+	public String getParecerBanca() {
+		return this.parecerBanca;
+	}
+	
+	/** @return Decisão da banca examinadora. */
+	public String getDecisaoBanca() {
+		return this.decisaoBanca;
+	}
+	
 	/************************ Bloco de Setters **************************/
 	
-	/** Seta a disciplina já fazendo algumas formatações para impressão.
-	 *  @param disciplina - nome da disciplina */
-	public void setDisciplina(String disciplina) {
-		
-		if (isEmpty(disciplina))
-			log("Falha ao obter nome da disciplina.");
-		else
-			this.disciplina = StringUtils.BR.normaliza(disciplina).replace("questões","Questões").replace("A","a");
-		
+	/** Setter da data de envio do recurso.
+	 *  @param dataRecurso - data de envio do recurso */
+	public void setDataRecurso(final LocalDateTime dataRecurso) {
+		this.dataRecurso = dataRecurso;
 	}
 	
-	/** Validando e setando o número de questão.
-	 *  @param num_questao - número da questão, armazenado aqui como 'int'. Caso o número informado via parâmetro seja nulo ou inválido, será atribuído o valor de erro '-1' nesta classe */
-	public void setNumQuestao(String num_questao) {
-		
-		try {
-			this.num_questao = Integer.parseInt(num_questao);
-		}
-		catch (Exception exception) {
-			log("Número de questão inválido");
-			this.num_questao = -1;
-		}
-		
+	/** Setter do nome do candidato.
+	 *  @param nomeCandidato - nome do candidato */
+	public void setNomeCandidato(final String nomeCandidato) {
+		this.nomeCandidato = nomeCandidato;
 	}
 	
-	/** Validando e setando o nome do interessado.
-	 *  @param nome_interessado - nome do candidato que solicitou este recurso */
-	public void setNomeInteressado(String nome_interessado) {
-		
-		if (isEmpty(nome_interessado))
-			log("Nome do interessado é vazio");
-		else
-			this.nome_interessado = StringUtils.BR.normaliza(nome_interessado);
-		
+	/** Setter do número de CPF do candidato.
+	 *  @param cpfCandidato - número de CPF do candidato */
+	public void setCPFCandidato(final String cpfCandidato) {
+		this.cpfCandidato = cpfCandidato;
 	}
 	
-	/** Validando e setando o questionamento do candidato.
-	 *  @param questionamento - texto do questionamento do candidato */
-	public void setQuestionamento(String questionamento) {
-		
-		if (isEmpty(questionamento))
-			log("Questionamento vazio");
-		else
-			this.questionamento = questionamento.trim();
-		
+	/** Setter do número de inscrição do candidato.
+	 *  @param inscricao - número de inscrição do candidato */
+	public void setInscricao(final Integer inscricao) {
+		this.inscricao = inscricao;
 	}
 	
-	/** Validando e setando a solicitação de alteração de gabarito.
-	 *  @param alteracao - representa a solicitação de alteração de gabarito preliminar por parte do candidato */
-	public void setAlteracao(String alteracao) {
-		
-		if (isEmpty(alteracao))
-			log("Solicitação de alteração de gabarito vazia");
-		else
-			this.alteracao = alteracao.trim();
-		
+	/** Setter do número da questão recursada.
+	 *  @param questao - número da questão recursada */
+	public void setQuestao(final Integer questao) {
+		this.questao = questao;
 	}
 	
-	/** Validando e setando o parecer da banca.
-	 *  @param parecer - texto que representa o parecer de resposta da banca examinadora */
-	public void setParecer(String parecer) {
-		
-		if (isEmpty(parecer))
-			log("Parecer da banca vazio");
-		else
-			this.parecer = parecer.trim();
-		
+	/** Setter do objeto de execução do concurso (cargo ou 'null', no caso dos processos seletivos para graduação).
+	 *  @param objeto - objeto de execução do concurso */
+	public void setObjeto(final String objeto) {
+		this.objeto = objeto;
 	}
 	
-	/** Validando e setando a resposta da banca.
-	 *  @param resposta - resposta da banca sobre a solicitação de alteração do candidato */
-	public void setResposta(String resposta) {
-		
-		if (isEmpty(resposta))
-			log("Resposta da banca vazia");
-		else
-			this.resposta = resposta.trim();
-		
+	/** Setter da disciplina recursada.
+	 *  @param disciplina - disciplina recursada */
+	public void setDisciplina(final String disciplina) {
+		this.disciplina = disciplina;
 	}
 	
-	/** Validando e setando o nome do cargo - exclusivo para os concursos públicos!
-	 *  @param cargo - nome do cargo (com código embutido) */
-	public void setCargo(String cargo) {
-		
-		if (isEmpty(cargo))
-			log("Nome do cargo vazio");
-		else
-			this.cargo = cargo.trim();
-		
+	/** Setter do questionamento do candidato.
+	 *  @param questionamento - questionamento do candidato */
+	public void setQuestionamento(final String questionamento) {
+		this.questionamento = questionamento;
 	}
 	
-	/************************ Bloco de Getters **************************/	
-	
-	public String getDisciplina() {
-		return disciplina;
-	}
-
-	public int getQuestao() {
-		return num_questao;
-	}
-
-	public String getInteressado() {
-		return nome_interessado;
-	}
-
-	public String getQuestionamento() {
-		return questionamento;
+	/** Setter do link de anexo de recurso do candidato.
+	 *  @param anexoCandidato - link de anexo de recurso do candidato */
+	public void setAnexoCandidato(final String anexoCandidato) {
+		this.anexoCandidato = anexoCandidato;
 	}
 	
-	public String getAlteracao() {
-		return alteracao;
-	}
-
-	public String getParecer() {
-		return parecer;
-	}
-
-	public String getResposta() {
-		return resposta;
+	/** Setter do recurso do candidato (solicitação de alteração de gabarito).
+	 *  @param recursoCandidato - recurso do candidato */
+	public void setRecurso(final String recurso) {
+		this.recurso = recurso;
 	}
 	
-	public String getCargo() {
-		return cargo;
+	/** Setter do parecer da banca examinadora.
+	 *  @param parecerBanca - parecer da banca examinadora */
+	public void setParecerBanca(final String parecerBanca) {
+		this.parecerBanca = parecerBanca;
 	}
 	
-	/************************ Bloco de Helpers **************************/
-	
-	/** Implementa um simples log de processamento no seguinte formato:
-	 *  [WRN: num_linha_planilha] mensagem
-	 *  @param msg - mensagem de log */
-	private void log(String msg) {
-		System.err.printf("[WRN] '%s'@%d %s\n",this.planilha,this.linha_excel,msg);
-	}
-	
-	/** Verifica se uma string é nula ou vazia
-	 *  @param string - string */
-	private boolean isEmpty(String string) {
-		return ((string == null) || string.trim().isEmpty());
-	}
-	
-	/** Verifica se o número de questão está fora do intervalo de questões deste recurso */
-	public boolean foraIntervalo() {
-		
-		final int[] interval = getInterval();
-		final boolean result = !(this.num_questao >= interval[0] && this.num_questao <= interval[1]);
-		
-		if (result)
-			log("Número de questão fora do intervalo");
-		
-		return result;
-		
-	}
-	
-	/** Retorna um array com o intervalo de questões (extraído da string de disciplina) */
-	private int[] getInterval() {
-		
-		Pattern pattern = Pattern.compile("\\d+");
-		
-		Matcher matcher = pattern.matcher(this.disciplina);
-		matcher.find();
-		
-		String first_num_str = matcher.group();
-		
-		String original_without_first_num = this.disciplina.substring(this.disciplina.indexOf(first_num_str)).replace(first_num_str,"");
-		
-		matcher = pattern.matcher(original_without_first_num);
-		matcher.find();
-		
-		String second_num_str = matcher.group();
-		
-		int first_num = Integer.valueOf(first_num_str);
-		int second_num = Integer.valueOf(second_num_str);
-		
-		return new int[] {first_num,second_num};
-		
+	/** Setter da decisão da banca examinadora.
+	 *  @param decisaoBanca - decisão da banca examinadora */
+	public void setDecisaoBanca(String decisaoBanca) {
+		this.decisaoBanca = decisaoBanca;
 	}
 	
 }
