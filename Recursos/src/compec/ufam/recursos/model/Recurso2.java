@@ -4,63 +4,76 @@ import java.time.*;
 
 /** Modelagem de um recurso.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 28/OUT/2023 */
+ *  @version 3.0, 29/OUT/2023 */
 public class Recurso2 {
 
 	private LocalDateTime dataRecurso;
 	private String nomeCandidato, cpfCandidato;
 	private Integer inscricao, questao;
 	private String objeto, disciplina;
-	private String questionamentoCandidato, anexoCandidato, recursoCandidato;
+	private String questionamento, anexoCandidato, recurso;
 	private String parecerBanca, decisaoBanca;
 	
 	/************************ Bloco de Getters **************************/
 	
-	public String getCpfCandidato() {
-		return cpfCandidato;
-	}
-	
+	/** @return Data de envio do recurso. */
 	public LocalDateTime getDataRecurso() {
-		return dataRecurso;
+		return this.dataRecurso;
 	}
 	
+	/** @return Nome do candidato. */
 	public String getNomeCandidato() {
-		return nomeCandidato;
+		return this.nomeCandidato;
 	}
 	
+	/** @return Número de CPF do candidato. */
+	public String getCPFCandidato() {
+		return this.cpfCandidato;
+	}
+	
+	/** @return Número de inscrição do candidato. */
 	public Integer getInscricao() {
-		return inscricao;
+		return this.inscricao;
 	}
 	
+	/** @return Número da questão recursada. */
 	public Integer getQuestao() {
-		return questao;
+		return this.questao;
 	}
 	
+	/** @return Objeto de execução do concurso (cargo ou 'null', no caso dos processos seletivos para graduação). */
 	public String getObjeto() {
-		return objeto;
+		return this.objeto;
 	}
 	
+	/** @return Disciplina recursada. */
 	public String getDisciplina() {
-		return disciplina;
-	}
-	public String getQuestionamento() {
-		return questionamentoCandidato;
+		return this.disciplina;
 	}
 	
+	/** @return Questionamento do candidato. */
+	public String getQuestionamento() {
+		return this.questionamento;
+	}
+	
+	/** @return Link de anexo de recurso do candidato. */
 	public String getAnexoCandidato() {
-		return anexoCandidato;
+		return this.anexoCandidato;
 	}
 
-	public String getAlteracaoCandidato() {
-		return recursoCandidato;
+	/** @return Recurso do candidato (solicitação de alteração de gabarito). */
+	public String getRecurso() {
+		return this.recurso;
 	}
 	
+	/** @return Parecer da banca examinadora. */
 	public String getParecerBanca() {
-		return parecerBanca;
+		return this.parecerBanca;
 	}
 	
+	/** @return Decisão da banca examinadora. */
 	public String getRespostaBanca() {
-		return decisaoBanca;
+		return this.decisaoBanca;
 	}
 	
 	/************************ Bloco de Setters **************************/
@@ -108,9 +121,9 @@ public class Recurso2 {
 	}
 	
 	/** Setter do questionamento do candidato.
-	 *  @param questionamentoCandidato - questionamento do candidato */
-	public void setQuestionamento(final String questionamentoCandidato) {
-		this.questionamentoCandidato = questionamentoCandidato;
+	 *  @param questionamento - questionamento do candidato */
+	public void setQuestionamento(final String questionamento) {
+		this.questionamento = questionamento;
 	}
 	
 	/** Setter do link de anexo de recurso do candidato.
@@ -121,8 +134,8 @@ public class Recurso2 {
 	
 	/** Setter do recurso do candidato (solicitação de alteração de gabarito).
 	 *  @param recursoCandidato - recurso do candidato */
-	public void setRecurso(final String recursoCandidato) {
-		this.recursoCandidato = recursoCandidato;
+	public void setRecurso(final String recurso) {
+		this.recurso = recurso;
 	}
 	
 	/** Setter do parecer da banca examinadora.

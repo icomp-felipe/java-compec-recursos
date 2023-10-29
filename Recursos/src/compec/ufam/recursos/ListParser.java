@@ -14,11 +14,11 @@ public class ListParser {
 
 	public static void gabarito(List<Recurso2> listaRecursos) {
 		
-		Map<Object, Map<String, String>> mapao =
+		/*Map<Object, Map<String, String>> mapao =
 		
 				listaRecursos.stream()
 		        .collect(Collectors.groupingBy(s -> s.getQuestao(),
-		            Collectors.toMap(Recurso2::getRespostaBanca, Recurso2.class)));
+		            Collectors.toMap(Recurso2::getRespostaBanca, Recurso2.class)));*/
 		
 	}
 	

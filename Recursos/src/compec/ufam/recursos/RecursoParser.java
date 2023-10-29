@@ -22,7 +22,7 @@ public class RecursoParser {
 			ui.warning("Linha %d: Nome de candidato vazio", linha);
 		
 		// Validação do número de CPF do candidato
-		if (!CPFParser.parse(recurso.getCpfCandidato()))
+		if (!CPFParser.parse(recurso.getCPFCandidato()))
 			ui.warning("Linha %d: CPF inválido", linha);
 		
 		// Validação do número de inscrição do candidato
@@ -41,7 +41,7 @@ public class RecursoParser {
 			ui.warning("Linha %d: Questionamento vazio", linha);
 		
 		// Validação do recurso do candidato
-		if (recurso.getAlteracaoCandidato() == null || recurso.getAlteracaoCandidato().isBlank())
+		if (recurso.getRecurso() == null || recurso.getRecurso().isBlank())
 			ui.warning("Linha %d: Recurso vazio", linha);
 		
 		// Validação parecer da banca examinadora

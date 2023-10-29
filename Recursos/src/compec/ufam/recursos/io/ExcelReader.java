@@ -4,9 +4,6 @@ import java.io.*;
 import java.text.*;
 import java.time.*;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.phill.libs.*;
 
@@ -19,7 +16,7 @@ import compec.ufam.recursos.model.*;
 
 /** Implementa os métodos de extração de recursos de uma planilha do Excel.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 28/OUT/2023 */
+ *  @version 3.0, 29/OUT/2023 */
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
