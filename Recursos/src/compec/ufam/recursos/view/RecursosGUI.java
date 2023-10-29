@@ -16,6 +16,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import com.phill.libs.ui.AlertDialog;
 import com.phill.libs.ui.ESCDispose;
@@ -55,8 +59,10 @@ public class RecursosGUI extends JFrame {
 	private final JTable tablePlanilha;
     private final RecursoTableModel modelPlanilha;
     private final JLabel labelInfo;
-    private final JTextArea textConsole;
+    private final JTextPane textConsole;
 	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonParse, buttonExport;
+	private final StyledDocument styledDocument;
+	private final Style greenFontStyle, orangeFontStyle, redFontStyle;
 	
 	// Declaração de atributos dinâmicos
 	private File sourceDir, targetDir;
@@ -228,11 +234,21 @@ public class RecursosGUI extends JFrame {
 		scrollConsole.setBounds(10, 25, 760, 194);
 		panelConsole.add(scrollConsole);
 		
-		textConsole = new JTextArea();
+		textConsole = new JTextPane();
 		textConsole.setFont(fonte);
 		textConsole.setEditable(false);
 		textConsole.setToolTipText(bundle.getString("hint-text-console"));
 		scrollConsole.setViewportView(textConsole);
+		
+		this.styledDocument = textConsole.getStyledDocument();
+		
+		this.orangeFontStyle = textConsole.addStyle("yellowFont", null);
+		this.greenFontStyle  = textConsole.addStyle("blackFont" , null);
+		this.redFontStyle    = textConsole.addStyle("redFont"   , null);
+
+		StyleConstants.setForeground(redFontStyle   , Color.RED);
+		StyleConstants.setForeground(orangeFontStyle, new Color(0xED921C));
+		StyleConstants.setForeground(greenFontStyle , new Color(0x228F1D));
 		
 		// Fundo da janela
 		labelInfo = new JLabel(loading);
@@ -528,19 +544,28 @@ public class RecursosGUI extends JFrame {
 	
 	public synchronized void log(final String format, final Object... args) {
 		
-		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[INFO] " + format + "\n", args)));
+		SwingUtilities.invokeLater(() -> {
+			try { styledDocument.insertString(styledDocument.getLength(), String.format("[INFO] " + format + "\n", args), greenFontStyle); }
+			catch (BadLocationException exception) { }
+		});
 		
 	}
 	
 	public synchronized void warning(final String format, final Object... args) {
 		
-		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[ATENÇÃO] " + format + "\n", args)));
+		SwingUtilities.invokeLater(() -> {
+			try { styledDocument.insertString(styledDocument.getLength(), String.format("[ALERT] " + format + "\n", args), orangeFontStyle); }
+			catch (BadLocationException exception) { }
+		});
 		
 	}
 	
 	public synchronized void error(final String format, final Object... args) {
 		
-		SwingUtilities.invokeLater(() -> textConsole.append(String.format("[ERRO] " + format + "\n", args)));
+		SwingUtilities.invokeLater(() -> {
+			try { styledDocument.insertString(styledDocument.getLength(), String.format("[ERRO] " + format + "\n", args), redFontStyle); }
+			catch (BadLocationException exception) { }
+		});
 		
 	}
 	
