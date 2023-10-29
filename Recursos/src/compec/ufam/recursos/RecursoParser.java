@@ -1,15 +1,24 @@
 package compec.ufam.recursos;
 
-import com.phill.libs.br.CPFParser;
+import com.phill.libs.br.*;
 
-import org.apache.poi.ss.usermodel.Row;
+import java.util.regex.*;
 
-import compec.ufam.recursos.model.Recurso2;
-import compec.ufam.recursos.view.RecursosGUI;
+import org.apache.poi.ss.usermodel.*;
 
+import compec.ufam.recursos.view.*;
+import compec.ufam.recursos.model.*;
+
+/** Implementa os verificadores de integridade dos dados de um {@link Recurso2}.
+ *  @author Felipe André - felipeandre.eng@gmail.com
+ *  @version 3.0, 29/OUT/2023 */
 public class RecursoParser {
 
-	public static boolean parse(final Recurso2 recurso, final Row row, final RecursosGUI ui) {
+	/** Realiza uma série de verificações de integridade dos dados de um <code>recurso</code> e exibe na <code>ui</code>.
+	 *  @param recurso - recurso
+	 *  @param row - linha da planilha de onde foi extraído o recurso
+	 *  @param ui - interface gráfica principal, para exibição de resultados */
+	public static void parse(final Recurso2 recurso, final Row row, final RecursosGUI ui) {
 		
 		final int linha = row.getRowNum() + 1;
 		
@@ -36,6 +45,16 @@ public class RecursoParser {
 		if (recurso.getDisciplina() == null || recurso.getDisciplina().isBlank())
 			ui.warning("Linha %d: Disciplina vazia", linha);
 		
+		// Verifica se o número da questão pertence à disciplina associada
+		else {
+			
+			final Integer[] interval = getInterval(recurso);
+			
+			if (recurso.getQuestao() != null && !(recurso.getQuestao() >= interval[0] && recurso.getQuestao() <= interval[1]))
+				ui.warning("Linha %d: Questão %d não pertence à disciplina '%s'", linha, recurso.getQuestao(), recurso.getDisciplina());
+			
+		}
+		
 		// Validação do questionamento do candidato
 		if (recurso.getQuestionamento() == null || recurso.getQuestionamento().isBlank())
 			ui.warning("Linha %d: Questionamento vazio", linha);
@@ -52,7 +71,50 @@ public class RecursoParser {
 		if (recurso.getRespostaBanca() == null || recurso.getRespostaBanca().isBlank())
 			ui.warning("Linha %d: Decisão de banca vazia", linha);
 		
-		return true;
+	}
+	
+	/** Extrai um array com o intervalo de questões a partir da string da disciplina.
+	 *  @param recurso - recurso
+	 *  @return Array com dois inteiros, sendo o primeiro representando o número de questão
+	 *  inicial e o segundo, o número da última questão contemplada pela disciplina do <code>recurso</code>,
+	 *  ou 'null' caso não seja possível extrair os dois números a partir do <code>recurso</code>. */
+	private static Integer[] getInterval(final Recurso2 recurso) {
+		
+		if (recurso != null) {
+			
+			final String disciplina = recurso.getDisciplina();
+			
+			Pattern pattern = Pattern.compile("\\d+");
+				
+			Matcher matcher = pattern.matcher(disciplina);
+			matcher.find();
+				
+			String firstNumString = matcher.group();
+				
+			if (firstNumString != null) {
+					
+				String originalWithoutFirstNum = disciplina.substring(disciplina.indexOf(firstNumString)).replaceFirst(firstNumString, "");
+					
+				matcher = pattern.matcher(originalWithoutFirstNum);
+				matcher.find();
+					
+				String secondNumString = matcher.group();
+					
+				if (secondNumString != null) {
+						
+					Integer firstNum  = Integer.valueOf(firstNumString );
+					Integer secondNum = Integer.valueOf(secondNumString);
+						
+					return new Integer[] {firstNum, secondNum};
+					
+				}
+					
+			}
+			
+		}
+		
+		return null;
+		
 	}
 	
 }
