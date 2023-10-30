@@ -63,8 +63,8 @@ public class RecursosGUI extends JFrame {
 	private Map<File, List<Recurso>> mapaRecursos;
 	
 	// MFV API
-	private final MandatoryFieldsManager fieldValidator;
-	private final MandatoryFieldsLogger  fieldLogger;
+	private final MandatoryFieldsManager parserValidator, gabaritoValidator;
+	private final MandatoryFieldsLogger  parserLogger, gabaritoLogger;
 	
 	// Carregando bundle de idiomas
 	private final static PropertyBundle bundle = new PropertyBundle("i18n/portuguese", null);
@@ -254,7 +254,7 @@ public class RecursosGUI extends JFrame {
 		getContentPane().add(buttonParse);
 		
 		buttonGabarito = new JButton(reportIcon);
-		buttonGabarito.setToolTipText((String) null);
+		buttonGabarito.setToolTipText(bundle.getString("hint-button-gabarito"));
 		buttonGabarito.addActionListener((event) -> actionGabarito());
 		buttonGabarito.setBounds(720, 683, 30, 25);
 		getContentPane().add(buttonGabarito);
@@ -270,11 +270,17 @@ public class RecursosGUI extends JFrame {
 		utilLoadProperty();
 		
 		// Cadastrando validação de campos
-		this.fieldValidator = new MandatoryFieldsManager();
-		this.fieldLogger    = new MandatoryFieldsLogger ();
+		this.parserValidator   = new MandatoryFieldsManager();
+		this.gabaritoValidator = new MandatoryFieldsManager();
 		
-		fieldValidator.addPermanent(labelOrigem , () -> sourceDir != null, bundle.getString("rui-mfv-sourcedir"), false);
-		fieldValidator.addPermanent(new JLabel(), () -> validateColumns(), bundle.getString("rui-mfv-columnsOk"), false);
+		this.parserLogger   = new MandatoryFieldsLogger();
+		this.gabaritoLogger = new MandatoryFieldsLogger();
+		
+		parserValidator.addPermanent(labelOrigem , () -> sourceDir != null, bundle.getString("rui-mfv-sourcedir"), false);
+		parserValidator.addPermanent(new JLabel(), () -> validateColumns(), bundle.getString("rui-mfv-columnsOk"), false);
+		
+		gabaritoValidator.addPermanent(labelOrigem, () -> this.mapaRecursos != null      , bundle.getString("rui-mfv-mapa"  ), false);
+		gabaritoValidator.addPermanent(labelEdital, () -> !textEdital.getText().isBlank(), bundle.getString("rui-mfv-edital"), false);
 		
 		setSize(800, 750);
 		setLocationRelativeTo(null);
@@ -316,35 +322,37 @@ public class RecursosGUI extends JFrame {
 	/** Calcula e exibe um resumo dos gabaritos. */
 	private void actionGabarito() {
 		
-		if (this.mapaRecursos != null) {
-			
-			try {
+		// Realizando validação dos campos antes de prosseguir
+		gabaritoValidator.validate(gabaritoLogger);
 				
-				Gabarito.show(textEdital.getText(), mapaRecursos);
-				
-			}
-			catch (Exception exception) {
-				
-				exception.printStackTrace();
-				
-			}
-			
+		if (gabaritoLogger.hasErrors()) {
+					
+			final String errors = bundle.getFormattedString("rui-gabarito-errors", gabaritoLogger.getErrorString());
+							
+			AlertDialog.error(this, getTitle(), errors);
+			gabaritoLogger.clear(); return;
+									
 		}
 		
+		// Iniciando o processo de geração de relatório
+		Thread gabarito = new Thread(() -> threadGabarito());
+		gabarito.setName("Thread de geração do relatório 'Resumo de Gabaritos'");
+		gabarito.start();
+			
 	}
 	
 	/** Carrega e analisa todas as planilhas do diretório informado. */
 	private void actionParse() {
 		
 		// Realizando validação dos campos antes de prosseguir
-		fieldValidator.validate(fieldLogger);
+		parserValidator.validate(parserLogger);
 		
-		if (fieldLogger.hasErrors()) {
+		if (parserLogger.hasErrors()) {
 			
-			final String errors = bundle.getFormattedString("rui-parse-errors", fieldLogger.getErrorString());
+			final String errors = bundle.getFormattedString("rui-parse-errors", parserLogger.getErrorString());
 					
 			AlertDialog.error(this, getTitle(), errors);
-			fieldLogger.clear(); return;
+			parserLogger.clear(); return;
 									
 		}
 		
@@ -426,6 +434,27 @@ public class RecursosGUI extends JFrame {
 			AlertDialog.error(this, getTitle(), bundle.getString("rui-load-prop-error"));
 			
 		}
+		
+	}
+	
+	/** Ativa ou desativa os campos de entrada de dados necessários para a geração do relatório 'Resumo de Gabaritos'.
+	 *  @param lock - estado da ativação dos campos */
+	private void utilLockGabaritoUI(final boolean lock) {
+		
+		final boolean enabled = !lock;
+		
+		SwingUtilities.invokeLater(() -> {
+			
+			labelInfo.setVisible(lock);
+
+			textEdital       .setEditable(enabled);
+			buttonEditalLimpa.setEnabled (enabled);
+			
+			buttonParse   .setEnabled(enabled);
+			buttonGabarito.setEnabled(enabled);
+			buttonExport  .setEnabled(enabled);
+			
+		});
 		
 	}
 	
@@ -531,6 +560,29 @@ public class RecursosGUI extends JFrame {
 		finally {
 			
 			labelInfo.setVisible(false);
+			
+		}
+		
+	}
+	
+	/** Constrói e exibe o relatório 'Resumo de Gabaritos'. */
+	private void threadGabarito() {
+		
+		try {
+			
+			utilLockGabaritoUI(true);
+			Gabarito.show(textEdital.getText(), mapaRecursos);
+				
+		}
+		catch (Exception exception) {
+				
+			exception.printStackTrace();
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-gabarito-pdferror"));
+				
+		}
+		finally {
+			
+			utilLockGabaritoUI(false);
 			
 		}
 		

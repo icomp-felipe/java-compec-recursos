@@ -19,8 +19,17 @@ hint-button-export   = Cria e exporta respostas aos recursos para PDF
 ########## Mensagens de erro da API MFV
 rui-mfv-columnsOk = Verifique se todas as colunas foram preenchidas na tabela
 rui-mfv-sourcedir = A pasta de origem de planilhas não foi selecionada
+rui-mfv-edital    = O edital não foi informado
+rui-mfv-mapa      = Primeiro deve-se carregar e analisar planilhas válidas
 
 ########## Métodos
+! RecursosUI::actionGabarito
+rui-gabarito-errors   = Existem algumas pendências impedindo a geração do gabarito::\n\
+                        \n\
+                        %s
+rui-gabarito-pdferror = Falha ao gerar o relatório 'Resumo de Gabaritos'!\n\
+                        Verifique o console para mais informações.
+
 ! RecursosUI::actionParse
 rui-parse-errors = Existem algumas pendências impedindo a análise de prosseguir:\n\
                    \n\

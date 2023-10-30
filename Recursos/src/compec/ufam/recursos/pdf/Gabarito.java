@@ -17,8 +17,16 @@ import net.sf.jasperreports.engine.util.*;
 
 import compec.ufam.recursos.model.*;
 
+/** Classe responsável pela construção e exibição do relatório 'Resumo de Gabaritos'.
+ *  @author Felipe André - felipeandre.eng@gmail.com
+ *  @version 3.0, 29/OUT/2023 */
 public class Gabarito {
 
+	/** Constrói e exibe o relatório 'Resumo de Gabaritos'.
+	 *  @param edital - dados do edital impressos no cabeçalho do relatório
+	 *  @param mapaRecursos - mapeamento de arquivos-recursos previamente processados
+	 *  @throws IOException quando o arquivo de logo do relatório (res/img/header-portrait.png) está inacessível
+	 *  @throws JRException quando há alguma falha no carregamento do relatório Jasper */
 	public static void show(final String edital, final Map<File, List<Recurso>> mapaRecursos) throws IOException, JRException {
 		
 		// Leitura dos arquivos
