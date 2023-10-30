@@ -12,8 +12,9 @@ hint-button-destino = Seleciona a pasta de saída das respostas aos recursos (em
 
 hint-text-console = Informações de processamento
 
-hint-button-parse  = Analisa as planilhas de entrada
-hint-button-export = Cria e exporta respostas aos recursos para PDF
+hint-button-parse    = Analisa as planilhas de entrada
+hint-button-gabarito = Calcula e gera resumos de gabarito em PDF
+hint-button-export   = Cria e exporta respostas aos recursos para PDF
 
 ########## Mensagens de erro da API MFV
 rui-mfv-columnsOk = Verifique se todas as colunas foram preenchidas na tabela

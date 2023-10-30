@@ -3,15 +3,9 @@ package compec.ufam.recursos.view;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -35,13 +29,11 @@ import com.phill.libs.mfvapi.MandatoryFieldsLogger;
 import com.phill.libs.mfvapi.MandatoryFieldsManager;
 import com.phill.libs.table.JTableMouseListener;
 
-import compec.ufam.recursos.io.ExcelReader;
-import compec.ufam.recursos.io.PDFWriter;
 import compec.ufam.recursos.model.Constants;
 import compec.ufam.recursos.model.Fields;
 import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.parser.DirectoryParser;
-import compec.ufam.recursos.parser.ListParser;
+import compec.ufam.recursos.pdf.Gabarito;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
 /** Implementa a interface gráfica do sistema.
@@ -59,25 +51,26 @@ public class RecursosGUI extends JFrame {
     private final RecursoTableModel modelPlanilha;
     private final JLabel labelInfo;
     private final JTextPane textConsole;
-	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonParse, buttonExport;
+	private final JButton buttonEditalLimpa, buttonOrigem, buttonDestino, buttonParse, buttonGabarito, buttonExport;
 	private final StyledDocument styledDocument;
 	private final Style greenFontStyle, orangeFontStyle, redFontStyle;
 	
+	// Declaração de atributos estáticos
+	private static final int excelColumnID = 2;
+	
 	// Declaração de atributos dinâmicos
 	private File sourceDir, targetDir;
+	private Map<File, List<Recurso>> mapaRecursos;
 	
 	// MFV API
 	private final MandatoryFieldsManager fieldValidator;
 	private final MandatoryFieldsLogger  fieldLogger;
 	
-	private static final int excelColumnID = 2;
-	
-	private int dir_proc, fil_proc;
-	
 	// Carregando bundle de idiomas
 	private final static PropertyBundle bundle = new PropertyBundle("i18n/portuguese", null);
 	
-    
+    /** Função principal instanciando a interface gráfica.
+     *  @param args - argumentos do S.O. */
 	public static void main(String[] args) { new RecursosGUI(); }
 
 	public RecursosGUI() {
@@ -257,8 +250,14 @@ public class RecursosGUI extends JFrame {
 		buttonParse = new JButton(parseIcon);
 		buttonParse.setToolTipText(bundle.getString("hint-button-parse"));
 		buttonParse.addActionListener((event) -> actionParse());
-		buttonParse.setBounds(720, 683, 30, 25);
+		buttonParse.setBounds(680, 683, 30, 25);
 		getContentPane().add(buttonParse);
+		
+		buttonGabarito = new JButton(reportIcon);
+		buttonGabarito.setToolTipText((String) null);
+		buttonGabarito.addActionListener((event) -> actionGabarito());
+		buttonGabarito.setBounds(720, 683, 30, 25);
+		getContentPane().add(buttonGabarito);
 		
 		buttonExport = new JButton(reportIcon);
 		buttonExport.setToolTipText(bundle.getString("hint-button-export"));
@@ -314,7 +313,25 @@ public class RecursosGUI extends JFrame {
 	
 	/******************** Bloco de Tratamento de Eventos de Botões *************************/
 	
-	private Map<File, List<Recurso>> mapaRecursos;
+	/** Calcula e exibe um resumo dos gabaritos. */
+	private void actionGabarito() {
+		
+		if (this.mapaRecursos != null) {
+			
+			try {
+				
+				Gabarito.show(textEdital.getText(), mapaRecursos);
+				
+			}
+			catch (Exception exception) {
+				
+				exception.printStackTrace();
+				
+			}
+			
+		}
+		
+	}
 	
 	/** Carrega e analisa todas as planilhas do diretório informado. */
 	private void actionParse() {
@@ -422,7 +439,12 @@ public class RecursosGUI extends JFrame {
 			
 			labelInfo.setVisible(lock);
 			tablePlanilha.setEnabled(enabled);
+			
 			buttonOrigem.setEnabled (enabled);
+			
+			buttonParse   .setEnabled(enabled);
+			buttonGabarito.setEnabled(enabled);
+			buttonExport  .setEnabled(enabled);
 			
 		});
 		
@@ -575,38 +597,6 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-	/** Valida os dados da tela */
-	private boolean util_parse_view(String edital, String data) {
-		
-		if (edital.equals("")) {
-			AlertDialog.error(this, "Preencha o nome do edital");
-			return false;
-		}
-		
-		if (data.equals("")) {
-			AlertDialog.error(this, "Selecione uma data");
-			return false;
-		}
-		
-		if (sourceDir == null) {
-			AlertDialog.error(this, "Selecione a pasta de origem");
-			return false;
-		}
-		
-		if (targetDir == null) {
-			AlertDialog.error(this, "Selecione a pasta de destino");
-			return false;
-		}
-		
-		if (AlertDialog.dialog(this, "Deseja mesmo continuar com o processamento?") != AlertDialog.OK_OPTION)
-			return false;
-		
-		return true;
-		
-	}
-
-
-	
 	
 	
 	
@@ -666,5 +656,4 @@ public class RecursosGUI extends JFrame {
 		}
 		
 	}
-	
 }

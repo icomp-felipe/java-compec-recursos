@@ -1,10 +1,7 @@
 package compec.ufam.recursos.parser;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.*;
-
-import org.apache.commons.io.FilenameUtils;
 
 import compec.ufam.recursos.view.*;
 import compec.ufam.recursos.model.*;
@@ -39,32 +36,6 @@ public class ListParser {
 				ui.warning("Questão %d possui diferentes decisões: %s", recursosAgrupados.getFirst().getQuestao(), Arrays.toString(mapaDecisoes.keySet().toArray()));
 			
 		}
-		
-	}
-	
-	/** Imprime o gabarito, calculado a partir da <code>listaRecursos</code>.
-	 *  @param listaRecursos - recursos extraídos da planilha
-	 *  @return String contendo o gabarito processado. */
-	public static String gabarito(List<Recurso> listaRecursos, File planilha) {
-
-		// Calculando o título do objeto
-		final StringBuilder builder = new StringBuilder("==> " + FilenameUtils.removeExtension(planilha.getName()) + "\n\n");
-		
-		// Filtra a lista por questão e decisão da banca
-		Map<Integer, Map<String, Recurso>> filtroQuestaoDecisao = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso::getQuestao, LinkedHashMap::new, Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1)));
-
-		// Imprime o gabarito para cada questão
-		for (Map.Entry<Integer, Map<String, Recurso>> mapaQuestaoDecisoes: filtroQuestaoDecisao.entrySet()) {
-			
-			Map<String, Recurso> mapaDecisoes = mapaQuestaoDecisoes.getValue();
-
-			builder.append(String.format("Questão %02d: %s\n", mapaQuestaoDecisoes.getKey(), mapaDecisoes.keySet()));
-			
-		}
-		
-		System.out.println(builder.toString());
-		
-		return builder.toString();
 		
 	}
 	

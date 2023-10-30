@@ -10,11 +10,9 @@ import com.phill.libs.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
-import compec.ufam.recursos.*;
 import compec.ufam.recursos.view.*;
 import compec.ufam.recursos.model.*;
-import compec.ufam.recursos.parser.ListParser;
-import compec.ufam.recursos.parser.RecursoParser;
+import compec.ufam.recursos.parser.*;
 
 /** Implementa os métodos de extração de recursos de uma planilha do Excel.
  *  @author Felipe André - felipeandre.eng@gmail.com
@@ -86,8 +84,7 @@ public class ExcelReader {
 			workbook.close();
 			
 			// Realizando validação geral dos dados
-			ListParser.parse   (listaRecursos, ui);
-			ListParser.gabarito(listaRecursos, planilha);
+			ListParser.parse(listaRecursos, ui);
 			
 		}
 		catch (Exception exception) {
@@ -128,7 +125,7 @@ public class ExcelReader {
 	private static boolean parseHeader(final Row row, final Integer[] indexes) {
 		
 		for (Fields field: Fields.values())
-			if (!field.getHeader().equals( getCellContent(row.getCell( indexes[field.getIndex()] )) ))
+			if (!field.getHeader().toLowerCase().equals( getCellContent(row.getCell( indexes[field.getIndex()] )).toLowerCase() ))
 				return false;
 		
 		return true;
