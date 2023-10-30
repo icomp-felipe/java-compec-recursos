@@ -34,6 +34,7 @@ import compec.ufam.recursos.model.Fields;
 import compec.ufam.recursos.model.Recurso;
 import compec.ufam.recursos.parser.DirectoryParser;
 import compec.ufam.recursos.pdf.Gabarito;
+import compec.ufam.recursos.pdf.Resposta;
 import compec.ufam.recursos.util.LGoodDatePickerUtils;
 
 /** Implementa a interface gráfica do sistema.
@@ -671,6 +672,18 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			utilLockRecursoUI(true);
+			
+			// Iterando por todas as entradas do mapa
+			for (Map.Entry<File, List<Recurso>> entries: mapaRecursos.entrySet()) {
+				
+				// Recuperando os objetos do mapeamento atual
+				File planilha = entries.getKey();
+				List<Recurso> listaRecursos = entries.getValue();
+			
+				Resposta.show(textEdital.getText(), datePicker.getDate(), planilha, listaRecursos);
+				
+			}
+			
 			
 		} catch (Exception exception) {
 			
