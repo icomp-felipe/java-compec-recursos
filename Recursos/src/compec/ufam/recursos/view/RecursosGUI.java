@@ -242,10 +242,10 @@ public class RecursosGUI extends JFrame {
 		
 		// Fundo da janela
 		labelInfo = new JLabel(loading);
+		labelInfo.setHorizontalAlignment(JLabel.LEFT);
 		labelInfo.setFont(fonte);
 		labelInfo.setVisible(false);
-		labelInfo.setText("Em processamento...");
-		labelInfo.setBounds(10, 685, 170, 20);
+		labelInfo.setBounds(10, 685, 652, 20);
 		getContentPane().add(labelInfo);
 		
 		buttonParse = new JButton(parseIcon);
@@ -475,6 +475,7 @@ public class RecursosGUI extends JFrame {
 		
 		SwingUtilities.invokeLater(() -> {
 			
+			labelInfo.setText("Gerando visualização...");
 			labelInfo.setVisible(lock);
 
 			textEdital       .setEditable(enabled);
@@ -496,6 +497,7 @@ public class RecursosGUI extends JFrame {
 		
 		SwingUtilities.invokeLater(() -> {
 			
+			labelInfo.setText("Analisando planilhas...");
 			labelInfo.setVisible(lock);
 			tablePlanilha.setEnabled(enabled);
 			
@@ -517,6 +519,7 @@ public class RecursosGUI extends JFrame {
 		
 		SwingUtilities.invokeLater(() -> {
 			
+			labelInfo.setText("Exportando respostas aos recursos...");
 			labelInfo.setVisible(lock);
 			
 			textEdital       .setEditable(enabled);
@@ -680,7 +683,10 @@ public class RecursosGUI extends JFrame {
 				File planilha = entries.getKey();
 				List<Recurso> listaRecursos = entries.getValue();
 			
-				Resposta.show(textEdital.getText(), datePicker.getDate(), planilha, listaRecursos);
+				// Construindo o relatório e exportando pra PDF
+				Resposta.exportPDF(textEdital.getText(), datePicker.getDate(), planilha, listaRecursos, targetDir);
+				
+				AlertDialog.info(this, getTitle(), bundle.getString("rui-thread-respostas-success"));
 				
 			}
 			

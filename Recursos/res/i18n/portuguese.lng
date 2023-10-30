@@ -57,5 +57,6 @@ rui-thread-parser-error = Falha ao analisar planilhas!\n\
                           Verifique o console para mais informações.
 
 ! RecursosUI::threadRespostas
-rui-thread-respostas-error = Falha ao exportar as respostas aos recursos!\n\
-                             Verifique o console para mais informações.
+rui-thread-respostas-success = Respostas aos recursos exportadas com sucesso!
+rui-thread-respostas-error   = Falha ao exportar as respostas aos recursos!\n\
+                               Verifique o console para mais informações.

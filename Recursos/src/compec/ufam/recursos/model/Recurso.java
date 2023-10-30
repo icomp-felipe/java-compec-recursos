@@ -1,10 +1,14 @@
 package compec.ufam.recursos.model;
 
 import java.time.*;
+import java.time.format.*;
+
+import com.phill.libs.*;
+import com.phill.libs.br.*;
 
 /** Modelagem de um recurso.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 29/OUT/2023 */
+ *  @version 3.0, 30/OUT/2023 */
 public class Recurso {
 
 	private LocalDateTime dataRecurso;
@@ -14,11 +18,6 @@ public class Recurso {
 	private String questionamento, anexoCandidato, recurso;
 	private String parecerBanca, decisaoBanca;
 	
-	@Override
-	public String toString() {
-		return String.format("Questão %d: %s", questao, decisaoBanca);
-	}
-	
 	/************************ Bloco de Getters **************************/
 	
 	/** @return Data de envio do recurso. */
@@ -26,14 +25,28 @@ public class Recurso {
 		return this.dataRecurso;
 	}
 	
+	public String getDataRecursoString() {
+		return this.dataRecurso == null ? null : this.dataRecurso.format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm:ss"));
+	}
+	
 	/** @return Nome do candidato. */
 	public String getNomeCandidato() {
 		return this.nomeCandidato;
 	}
 	
+	/** @return Nome do candidato (normalizado). */
+	public String getNomeNormalizado() {
+		return StringUtils.BR.normaliza(this.nomeCandidato);
+	}
+	
 	/** @return Número de CPF do candidato. */
 	public String getCPFCandidato() {
 		return this.cpfCandidato;
+	}
+	
+	/** @return Número de CPF do candidato, seguindo as regras da LGPD-BR. */
+	public String getCPFOculto() {
+		return CPFParser.oculta(this.cpfCandidato);
 	}
 	
 	/** @return Número de inscrição do candidato. */
@@ -53,7 +66,7 @@ public class Recurso {
 	
 	/** @return Disciplina recursada. */
 	public String getDisciplina() {
-		return this.disciplina;
+		return this.disciplina == null ? null : this.disciplina.replace(".", "");
 	}
 	
 	/** @return Questionamento do candidato. */
@@ -69,6 +82,14 @@ public class Recurso {
 	/** @return Recurso do candidato (solicitação de alteração de gabarito). */
 	public String getRecurso() {
 		return this.recurso;
+	}
+	
+	/** @return Recurso do candidato (solicitação de alteração de gabarito). */
+	public String getRecursoCompleto() {
+		return this.recurso == null ? null
+				                    : (this.recurso.trim().length() == 1 && StringUtils.isAlphaStringOnly(this.recurso))
+				                    ? String.format("Alterar o gabarito para a letra \"%s\"", this.recurso.trim())
+				                    : this.recurso;
 	}
 	
 	/** @return Parecer da banca examinadora. */
