@@ -21,19 +21,24 @@ rui-mfv-columnsOk = Verifique se todas as colunas foram preenchidas na tabela
 rui-mfv-sourcedir = A pasta de origem de planilhas não foi selecionada
 rui-mfv-edital    = O edital não foi informado
 rui-mfv-mapa      = Primeiro deve-se carregar e analisar planilhas válidas
+rui-mfv-data      = A data de publicação não foi informada
+rui-mfv-targetdir = A pasta de saída das respostas não foi selecionada
 
 ########## Métodos
 ! RecursosUI::actionGabarito
 rui-gabarito-errors   = Existem algumas pendências impedindo a geração do gabarito::\n\
                         \n\
                         %s
-rui-gabarito-pdferror = Falha ao gerar o relatório 'Resumo de Gabaritos'!\n\
-                        Verifique o console para mais informações.
 
 ! RecursosUI::actionParse
 rui-parse-errors = Existem algumas pendências impedindo a análise de prosseguir:\n\
                    \n\
                    %s
+
+! RecursosUI::actionRespostas
+rui-respostas-errors = Existem algumas pendências impedindo a geração de respostas:\n\
+                       \n\
+                       %s
 
 ! RecursosUI::utilLoadProperty
 rui-load-prop-error = Falha ao carregar a configuração de colunas!\n\
@@ -43,6 +48,14 @@ rui-load-prop-error = Falha ao carregar a configuração de colunas!\n\
 rui-save-prop-error = Falha ao salvar a configuração de colunas!\n\
                       Verifique o console para mais informações.
 
+! RecursosUI::threadGabarito
+rui-thread-gabarito-error = Falha ao gerar o relatório 'Resumo de Gabaritos'!\n\
+                            Verifique o console para mais informações.
+
 ! RecursosUI::threadParser
 rui-thread-parser-error = Falha ao analisar planilhas!\n\
                           Verifique o console para mais informações.
+
+! RecursosUI::threadRespostas
+rui-thread-respostas-error = Falha ao exportar as respostas aos recursos!\n\
+                             Verifique o console para mais informações.

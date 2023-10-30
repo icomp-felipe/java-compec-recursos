@@ -63,8 +63,8 @@ public class RecursosGUI extends JFrame {
 	private Map<File, List<Recurso>> mapaRecursos;
 	
 	// MFV API
-	private final MandatoryFieldsManager parserValidator, gabaritoValidator;
-	private final MandatoryFieldsLogger  parserLogger, gabaritoLogger;
+	private final MandatoryFieldsManager parserValidator, gabaritoValidator, respostasValidator;
+	private final MandatoryFieldsLogger  parserLogger, gabaritoLogger, respostasLogger;
 	
 	// Carregando bundle de idiomas
 	private final static PropertyBundle bundle = new PropertyBundle("i18n/portuguese", null);
@@ -261,7 +261,7 @@ public class RecursosGUI extends JFrame {
 		
 		buttonExport = new JButton(reportIcon);
 		buttonExport.setToolTipText(bundle.getString("hint-button-export"));
-		buttonExport.addActionListener((event) -> action_proccess());
+		buttonExport.addActionListener((event) -> actionRespostas());
 		buttonExport.setBounds(760, 683, 30, 25);
 		getContentPane().add(buttonExport);
 		
@@ -270,17 +270,24 @@ public class RecursosGUI extends JFrame {
 		utilLoadProperty();
 		
 		// Cadastrando validação de campos
-		this.parserValidator   = new MandatoryFieldsManager();
-		this.gabaritoValidator = new MandatoryFieldsManager();
+		this.parserValidator    = new MandatoryFieldsManager();
+		this.gabaritoValidator  = new MandatoryFieldsManager();
+		this.respostasValidator = new MandatoryFieldsManager();
 		
-		this.parserLogger   = new MandatoryFieldsLogger();
-		this.gabaritoLogger = new MandatoryFieldsLogger();
+		this.parserLogger    = new MandatoryFieldsLogger();
+		this.gabaritoLogger  = new MandatoryFieldsLogger();
+		this.respostasLogger = new MandatoryFieldsLogger();
 		
 		parserValidator.addPermanent(labelOrigem , () -> sourceDir != null, bundle.getString("rui-mfv-sourcedir"), false);
 		parserValidator.addPermanent(new JLabel(), () -> validateColumns(), bundle.getString("rui-mfv-columnsOk"), false);
 		
 		gabaritoValidator.addPermanent(labelOrigem, () -> this.mapaRecursos != null      , bundle.getString("rui-mfv-mapa"  ), false);
 		gabaritoValidator.addPermanent(labelEdital, () -> !textEdital.getText().isBlank(), bundle.getString("rui-mfv-edital"), false);
+		
+		respostasValidator.addPermanent(labelEdital , () -> !textEdital.getText().isBlank(), bundle.getString("rui-mfv-edital"   ), false);
+		respostasValidator.addPermanent(labelData   , () -> datePicker.getDate() != null   , bundle.getString("rui-mfv-data"     ), false);
+		respostasValidator.addPermanent(labelOrigem , () -> this.mapaRecursos != null      , bundle.getString("rui-mfv-mapa"     ), false);
+		respostasValidator.addPermanent(labelDestino, () -> targetDir != null              , bundle.getString("rui-mfv-targetdir"), false);
 		
 		setSize(800, 750);
 		setLocationRelativeTo(null);
@@ -360,6 +367,28 @@ public class RecursosGUI extends JFrame {
 		Thread parser = new Thread(() -> threadParser());
 		parser.setName("Thread analista de planilhas");
 		parser.start();
+		
+	}
+	
+	/** Gera e exporta as respostas aos recursos no diretório de saída. */
+	private void actionRespostas() {
+	
+		// Realizando validação dos campos antes de prosseguir
+		respostasValidator.validate(respostasLogger);
+		
+		if (respostasLogger.hasErrors()) {
+			
+			final String errors = bundle.getFormattedString("rui-respostas-errors", respostasLogger.getErrorString());
+					
+			AlertDialog.error(this, getTitle(), errors);
+			respostasLogger.clear(); return;
+									
+		}
+		
+		// Iniciando a exportação das respostas
+		Thread respostas = new Thread(() -> threadRespostas());
+		respostas.setName("Thread de exportação de respostas");
+		respostas.start();
 		
 	}
 	
@@ -479,6 +508,32 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
+	/** Ativa ou desativa os campos de entrada de dados necessários para a exportação das respostas aos recursos.
+	 *  @param lock - estado da ativação dos campos */
+	private void utilLockRecursoUI(final boolean lock) {
+		
+		final boolean enabled = !lock;
+		
+		SwingUtilities.invokeLater(() -> {
+			
+			labelInfo.setVisible(lock);
+			
+			textEdital       .setEditable(enabled);
+			buttonEditalLimpa.setEnabled (enabled);
+			
+			datePicker.setEnabled(enabled);
+			
+			buttonOrigem .setEnabled(enabled);
+			buttonDestino.setEnabled(enabled);
+			
+			buttonParse   .setEnabled(enabled);
+			buttonGabarito.setEnabled(enabled);
+			buttonExport  .setEnabled(enabled);
+			
+		});
+		
+	}
+	
 	/** Salva a configuração de colunas na tabela no arquivo de propriedades do sistema. */
 	private void utilSaveProperty() {
 
@@ -577,7 +632,7 @@ public class RecursosGUI extends JFrame {
 		catch (Exception exception) {
 				
 			exception.printStackTrace();
-			AlertDialog.error(this, getTitle(), bundle.getString("rui-gabarito-pdferror"));
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-gabarito-pdferror"));
 				
 		}
 		finally {
@@ -610,9 +665,24 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-	/** Valida os dados da tela e, se tudo estiver certo, inicia a geração de relatórios */
-	private void action_proccess() {
+	/** Exporta as respostas aos recursos pra PDF. */
+	private void threadRespostas() {
 		
+		try {
+			
+			utilLockRecursoUI(true);
+			
+		} catch (Exception exception) {
+			
+			exception.printStackTrace();
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-respostas-error"));
+			
+		}
+		finally {
+			
+			utilLockRecursoUI(false);
+			
+		}
 		
 	}
 	
@@ -708,4 +778,5 @@ public class RecursosGUI extends JFrame {
 		}
 		
 	}
+	
 }
