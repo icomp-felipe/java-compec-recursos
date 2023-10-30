@@ -686,20 +686,15 @@ public class RecursosGUI extends JFrame {
 				// Construindo o relatório e exportando pra PDF
 				Resposta.exportPDF(textEdital.getText(), datePicker.getDate(), planilha, listaRecursos, targetDir);
 				
-				AlertDialog.info(this, getTitle(), bundle.getString("rui-thread-respostas-success"));
-				
 			}
 			
+			utilLockRecursoUI(false);
+			AlertDialog.info(this, getTitle(), bundle.getString("rui-thread-respostas-success"));
 			
 		} catch (Exception exception) {
 			
-			exception.printStackTrace();
+			exception.printStackTrace(); utilLockRecursoUI(false);
 			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-respostas-error"));
-			
-		}
-		finally {
-			
-			utilLockRecursoUI(false);
 			
 		}
 		
