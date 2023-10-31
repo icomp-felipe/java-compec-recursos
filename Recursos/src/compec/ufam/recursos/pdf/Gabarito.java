@@ -19,7 +19,7 @@ import compec.ufam.recursos.model.*;
 
 /** Classe responsável pela construção e exibição do relatório 'Resumo de Gabaritos'.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 29/OUT/2023 */
+ *  @version 3.0, 31/OUT/2023 */
 public class Gabarito {
 
 	/** Constrói e exibe o relatório 'Resumo de Gabaritos'.
@@ -42,7 +42,7 @@ public class Gabarito {
 		parameters.put("PAR_GABARITO" ,	compute(mapaRecursos));
 		
 		// Preenchendo o relatório
-		JasperPrint  prints = JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
+		JasperPrint prints = JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
 		
 		// Preparando e exibindo o relatório
 		JasperViewer viewer = new JasperViewer(prints, false);

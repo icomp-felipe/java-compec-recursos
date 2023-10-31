@@ -11,14 +11,14 @@ import compec.ufam.recursos.model.*;
 
 /** Implementa os verificadores de integridade dos dados de um {@link Recurso}.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 29/OUT/2023 */
+ *  @version 3.0, 31/OUT/2023 */
 public class RecursoParser {
 
 	/** Realiza uma série de verificações de integridade dos dados de um <code>recurso</code> e exibe na <code>ui</code>.
 	 *  @param recurso - recurso
 	 *  @param row - linha da planilha de onde foi extraído o recurso
 	 *  @param ui - interface gráfica principal, para exibição de resultados */
-	public static void parse(final Recurso recurso, final Row row, final RecursosGUI ui) {
+	public static void parse(final Recurso recurso, final Row row, final RecursysMainUI ui) {
 		
 		final int linha = row.getRowNum() + 1;
 		

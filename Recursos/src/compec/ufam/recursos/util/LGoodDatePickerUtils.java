@@ -13,7 +13,7 @@ import com.github.lgooddatepicker.components.TimePickerSettings.*;
 
 /** Helper para criação de {@link DatePicker} and {@link DateTimePicker}.
  *  Todos esses componentes contém personalização nos botões e fontes.
- *  @author Felipe André - felipeandresouza@hotmail.com
+ *  @author Felipe André - felipeandre.eng@gmail.com
  *  @version 1.0, 22/JAN/2022 */
 public class LGoodDatePickerUtils {
 	

@@ -16,7 +16,7 @@ import compec.ufam.recursos.parser.*;
 
 /** Implementa os métodos de extração de recursos de uma planilha do Excel.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 29/OUT/2023 */
+ *  @version 3.0, 31/OUT/2023 */
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -26,7 +26,7 @@ public class ExcelReader {
 	 *  @param planilha - planilha de dados
 	 *  @param indexes - índices das colunas
 	 *  @return Lista com todos os recursos contidos na planilha, ou 'null' se ocorrer alguma exceção ou se a planilha não estiver no formato certo. */
-	public static List<Recurso> read(final File planilha, final Integer[] indexes, final RecursosGUI ui) {
+	public static List<Recurso> read(final File planilha, final Integer[] indexes, final RecursysMainUI ui) {
 		
 		// Instanciando a lista de recursos
 		final List<Recurso> listaRecursos = new ArrayList<Recurso>();
@@ -122,10 +122,18 @@ public class ExcelReader {
 	    return true;
 	}
 	
+	/** Verifica se o cabeçalho da planilha é igual ao declarado em 'Fields'.
+	 *  @param row - primeira linha da planilha
+	 *  @param indexes - índices das colunas */
 	private static boolean parseHeader(final Row row, final Integer[] indexes) {
 		
 		for (Fields field: Fields.values())
-			if (!field.getHeader().toLowerCase().equals( getCellContent(row.getCell( indexes[field.getIndex()] )).toLowerCase() ))
+			
+			// O único campo que pode ser nulo é o cargo, pois só o PSTEC possui
+			if (field == Fields.CARGO && indexes[field.getIndex()] == null) continue;
+		
+			// Caso contrário, verificar se existem as demais colunas na planilha
+			else if (!field.getHeader().toLowerCase().equals( getCellContent(row.getCell( indexes[field.getIndex()] )).toLowerCase() ))
 				return false;
 		
 		return true;

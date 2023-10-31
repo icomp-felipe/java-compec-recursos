@@ -10,9 +10,18 @@ import compec.ufam.recursos.io.*;
 import compec.ufam.recursos.view.*;
 import compec.ufam.recursos.model.*;
 
+/** Implementa métodos para análise e carregamento de dados das planilhas de recursos.
+ *  @author Felipe André - felipeandre.eng@gmail.com
+ *  @version 3.0, 31/OUT/2023 */
 public class DirectoryParser {
 
-	public static Map<File, List<Recurso>> parse(final File directory, final String[] columns, final RecursosGUI ui) throws IOException {
+	/** Extrai os dados de todas as planilhas contidas em <code>directory</code> e seus subdiretórios par um mapa arquivo-recursos.
+	 *  @param directory - diretório contendo as planilhas para análise e extração de dados
+	 *  @param columns - índices das colunas
+	 *  @param ui - interface gráfica principal, para exibição de resultados
+	 *  @return Mapeamento 'arquivo-recursos' contendo em cada entrada o arquivo da planilha seguido com uma lista de recursos carregados a partir dela.
+	 *  @throws IOException quando as planilhas ou o diretório não podem ser lidos.  */
+	public static Map<File, List<Recurso>> parse(final File directory, final String[] columns, final RecursysMainUI ui) throws IOException {
 		
 		final Map<File, List<Recurso>> mapaRecursos = new LinkedHashMap<File, List<Recurso>>();
 		final Integer[] indexes = utilGetExcelIndexes(columns);
@@ -24,6 +33,9 @@ public class DirectoryParser {
 		return mapaRecursos;
 	}
 	
+	/** Converte os índices das colunas da planilha de String pra int.
+	 *  @param columns - índices das colunas no formato de String
+	 *  @return Array de inteiros representando os índices no formato do Apache POI. */
 	private static Integer[] utilGetExcelIndexes(final String[] columns) {
 		
 		final Integer[] indexes = new Integer[Constants.fieldCount];

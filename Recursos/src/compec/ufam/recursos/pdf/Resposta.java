@@ -22,7 +22,7 @@ import compec.ufam.recursos.model.*;
 
 /** Classe responsável pela construção e exibição do relatório 'Respostas aos Recursos'.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 30/OUT/2023 */
+ *  @version 3.0, 31/OUT/2023 */
 public class Resposta {
 
 	/** Gera a visualização do relatório 'Respostas aos Recursos'.

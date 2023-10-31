@@ -25,38 +25,38 @@ rui-mfv-data      = A data de publicação não foi informada
 rui-mfv-targetdir = A pasta de saída das respostas não foi selecionada
 
 ########## Métodos
-! RecursosUI::actionGabarito
+! RecursysMainUI::actionGabarito
 rui-gabarito-errors   = Existem algumas pendências impedindo a geração do gabarito::\n\
                         \n\
                         %s
 
-! RecursosUI::actionParse
+! RecursysMainUI::actionParse
 rui-parse-errors = Existem algumas pendências impedindo a análise de prosseguir:\n\
                    \n\
                    %s
 
-! RecursosUI::actionRespostas
+! RecursysMainUI::actionRespostas
 rui-respostas-errors = Existem algumas pendências impedindo a geração de respostas:\n\
                        \n\
                        %s
 
-! RecursosUI::utilLoadProperty
+! RecursysMainUI::utilLoadProperty
 rui-load-prop-error = Falha ao carregar a configuração de colunas!\n\
                       Verifique o console para mais informações.
 
-! RecursosUI::utilSaveProperty
+! RecursysMainUI::utilSaveProperty
 rui-save-prop-error = Falha ao salvar a configuração de colunas!\n\
                       Verifique o console para mais informações.
 
-! RecursosUI::threadGabarito
+! RecursysMainUI::threadGabarito
 rui-thread-gabarito-error = Falha ao gerar o relatório 'Resumo de Gabaritos'!\n\
                             Verifique o console para mais informações.
 
-! RecursosUI::threadParser
+! RecursysMainUI::threadParser
 rui-thread-parser-error = Falha ao analisar planilhas!\n\
                           Verifique o console para mais informações.
 
-! RecursosUI::threadRespostas
+! RecursysMainUI::threadRespostas
 rui-thread-respostas-success = Respostas aos recursos exportadas com sucesso!
 rui-thread-respostas-error   = Falha ao exportar as respostas aos recursos!\n\
                                Verifique o console para mais informações.

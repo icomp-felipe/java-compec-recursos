@@ -8,13 +8,13 @@ import compec.ufam.recursos.model.*;
 
 /** Implementa verificadores gerais de integridade de uma lista de recursos.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 29/OUT/2023 */
+ *  @version 3.0, 31/OUT/2023 */
 public class ListParser {
 
 	/** Realiza verificação de duplicidade de decisões pra mesma questão e se há diferentes disciplinas na mesma lista.
 	 *  @param listaRecursos - recursos extraídos da planilha
 	 *  @param ui - interface gráfica principal para exibição de resultados */
-	public static void parse(final List<Recurso> listaRecursos, final RecursosGUI ui) {
+	public static void parse(final List<Recurso> listaRecursos, final RecursysMainUI ui) {
 		
 		// Verificando se existem diferentes disciplinas
 		Map<String, Recurso> mapaDisciplinas = listaRecursos.stream().collect(Collectors.toMap(Recurso::getDisciplina, recurso -> recurso, (recurso1, recurso2) -> recurso1));

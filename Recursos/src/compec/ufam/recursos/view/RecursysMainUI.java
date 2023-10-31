@@ -1,53 +1,43 @@
 package compec.ufam.recursos.view;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.nio.file.Files;
+import java.awt.event.*;
+
+import java.io.*;
+import java.nio.file.*;
+
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
+import javax.swing.table.*;
 
-import com.phill.libs.ui.AlertDialog;
-import com.phill.libs.ui.ESCDispose;
-import com.phill.libs.ui.GraphicsHelper;
-import com.phill.libs.ui.ShortcutAction;
-import com.github.lgooddatepicker.components.DatePicker;
-import com.phill.libs.PropertiesManager;
-import com.phill.libs.ResourceManager;
-import com.phill.libs.files.PhillFileUtils;
-import com.phill.libs.i18n.PropertyBundle;
-import com.phill.libs.mfvapi.MandatoryFieldsLogger;
-import com.phill.libs.mfvapi.MandatoryFieldsManager;
-import com.phill.libs.table.JTableMouseListener;
+import com.phill.libs.*;
+import com.phill.libs.ui.*;
+import com.phill.libs.i18n.*;
+import com.phill.libs.files.*;
+import com.phill.libs.table.*;
+import com.phill.libs.mfvapi.*;
 
-import compec.ufam.recursos.model.Constants;
-import compec.ufam.recursos.model.Fields;
-import compec.ufam.recursos.model.Recurso;
-import compec.ufam.recursos.parser.DirectoryParser;
-import compec.ufam.recursos.pdf.Gabarito;
-import compec.ufam.recursos.pdf.Resposta;
-import compec.ufam.recursos.util.LGoodDatePickerUtils;
+import compec.ufam.recursos.pdf.*;
+import compec.ufam.recursos.util.*;
+import compec.ufam.recursos.model.*;
+import compec.ufam.recursos.parser.*;
+
+import com.github.lgooddatepicker.components.*;
 
 /** Implementa a interface gráfica do sistema.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 27/OUT/2023 */
-public class RecursosGUI extends JFrame {
+ *  @version 3.0, 31/OUT/2023 */
+public class RecursysMainUI extends JFrame {
 
 	// Serial
 	private static final long serialVersionUID = 6968825769983359575L;
 
 	// Declaração de atributos gráficos
 	private final JTextField textEdital, textDestino, textOrigem;
-	private final DatePicker datePicker;
+	private final DatePicker pickerPublicacao;
 	private final JTable tablePlanilha;
     private final RecursoTableModel modelPlanilha;
     private final JLabel labelInfo;
@@ -72,14 +62,15 @@ public class RecursosGUI extends JFrame {
 	
     /** Função principal instanciando a interface gráfica.
      *  @param args - argumentos do S.O. */
-	public static void main(String[] args) { new RecursosGUI(); }
+	public static void main(String[] args) { new RecursysMainUI(); }
 
-	public RecursosGUI() {
+	/** Construtor inicializando a interface gráfica. */
+	public RecursysMainUI() {
 		super("Recursys v.3.0");
 		
 		// Inicializando atributos gráficos
 		GraphicsHelper instance = GraphicsHelper.getInstance();
-		//GraphicsHelper.setFrameIcon(this,"icon/windows-icon.png");
+		GraphicsHelper.setFrameIcon(this,"icon/recursys-icon.png");
 		ESCDispose.register(this);
 		getContentPane().setLayout(null);
 		
@@ -121,17 +112,17 @@ public class RecursosGUI extends JFrame {
 		buttonEditalLimpa.setBounds(490, 30, 30, 25);
 		panelConcurso.add(buttonEditalLimpa);
 		
-		JLabel labelData = new JLabel("Publicação:");
-		labelData.setHorizontalAlignment(JLabel.RIGHT);
-		labelData.setFont(fonte);
-		labelData.setBounds(530, 30, 85, 20);
-		panelConcurso.add(labelData);
+		JLabel labelPublicacao = new JLabel("Publicação:");
+		labelPublicacao.setHorizontalAlignment(JLabel.RIGHT);
+		labelPublicacao.setFont(fonte);
+		labelPublicacao.setBounds(530, 30, 85, 20);
+		panelConcurso.add(labelPublicacao);
 		
-		datePicker = LGoodDatePickerUtils.getDatePicker();
-		datePicker.getComponentDateTextField().setToolTipText(bundle.getString("hint-datepicker"));
-		datePicker.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
-		datePicker.setBounds(620, 27, 145, 30);
-		panelConcurso.add(datePicker);
+		pickerPublicacao = LGoodDatePickerUtils.getDatePicker();
+		pickerPublicacao.getComponentDateTextField().setToolTipText(bundle.getString("hint-datepicker"));
+		pickerPublicacao.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
+		pickerPublicacao.setBounds(620, 27, 145, 30);
+		panelConcurso.add(pickerPublicacao);
 		
 		// Painel 'Planilhas de Entrada'
 		JPanel panelPlanilha = new JPanel();
@@ -286,7 +277,7 @@ public class RecursosGUI extends JFrame {
 		gabaritoValidator.addPermanent(labelEdital, () -> !textEdital.getText().isBlank(), bundle.getString("rui-mfv-edital"), false);
 		
 		respostasValidator.addPermanent(labelEdital , () -> !textEdital.getText().isBlank(), bundle.getString("rui-mfv-edital"   ), false);
-		respostasValidator.addPermanent(labelData   , () -> datePicker.getDate() != null   , bundle.getString("rui-mfv-data"     ), false);
+		respostasValidator.addPermanent(labelPublicacao   , () -> pickerPublicacao.getDate() != null   , bundle.getString("rui-mfv-data"     ), false);
 		respostasValidator.addPermanent(labelOrigem , () -> this.mapaRecursos != null      , bundle.getString("rui-mfv-mapa"     ), false);
 		respostasValidator.addPermanent(labelDestino, () -> targetDir != null              , bundle.getString("rui-mfv-targetdir"), false);
 		
@@ -525,7 +516,7 @@ public class RecursosGUI extends JFrame {
 			textEdital       .setEditable(enabled);
 			buttonEditalLimpa.setEnabled (enabled);
 			
-			datePicker.setEnabled(enabled);
+			pickerPublicacao.setEnabled(enabled);
 			
 			buttonOrigem .setEnabled(enabled);
 			buttonDestino.setEnabled(enabled);
@@ -630,19 +621,14 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			utilLockGabaritoUI(true);
-			Gabarito.show(textEdital.getText(), mapaRecursos);
+			Gabarito.show(textEdital.getText(), mapaRecursos); utilLockGabaritoUI(false);
 				
 		}
 		catch (Exception exception) {
 				
-			exception.printStackTrace();
+			exception.printStackTrace(); utilLockGabaritoUI(false);
 			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-gabarito-pdferror"));
 				
-		}
-		finally {
-			
-			utilLockGabaritoUI(false);
-			
 		}
 		
 	}
@@ -653,17 +639,12 @@ public class RecursosGUI extends JFrame {
 		try {
 			
 			utilLockParseUI(true);
-			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable(), this);
+			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable(), this); utilLockParseUI(false);
 			
 		} catch (Exception exception) {
 			
-			exception.printStackTrace();
+			exception.printStackTrace(); utilLockParseUI(false);
 			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-parser-error"));
-			
-		}
-		finally {
-			
-			utilLockParseUI(false);
 			
 		}
 		
@@ -684,7 +665,7 @@ public class RecursosGUI extends JFrame {
 				List<Recurso> listaRecursos = entries.getValue();
 			
 				// Construindo o relatório e exportando pra PDF
-				Resposta.exportPDF(textEdital.getText(), datePicker.getDate(), planilha, listaRecursos, targetDir);
+				Resposta.exportPDF(textEdital.getText(), pickerPublicacao.getDate(), planilha, listaRecursos, targetDir);
 				
 			}
 			
@@ -700,12 +681,11 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-
+	/******************************** Bloco dos Loggers ************************************/
 	
-
-	
-	
-	
+	/** Imprime uma mensagem comum no console.
+	 *  @param format - formato do texto
+	 *  @param args - argumentos referenciados no formato */
 	public synchronized void log(final String format, final Object... args) {
 		
 		SwingUtilities.invokeLater(() -> {
@@ -715,6 +695,9 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
+	/** Imprime uma mensagem de aviso no console.
+	 *  @param format - formato do texto
+	 *  @param args - argumentos referenciados no formato */
 	public synchronized void warning(final String format, final Object... args) {
 		
 		SwingUtilities.invokeLater(() -> {
@@ -724,6 +707,9 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
+	/** Imprime uma mensagem de erro no console.
+	 *  @param format - formato do texto
+	 *  @param args - argumentos referenciados no formato */
 	public synchronized void error(final String format, final Object... args) {
 		
 		SwingUtilities.invokeLater(() -> {
@@ -733,8 +719,7 @@ public class RecursosGUI extends JFrame {
 		
 	}
 	
-	
-	
+	/************************** Bloco de Classes Auxiliares ********************************/
 	
 	/** Implementa o modelo de dados da tabela de configuração de colunas das planilhas de entrada.
 	 *  @author Felipe André - felipeandre.eng@gmail.com

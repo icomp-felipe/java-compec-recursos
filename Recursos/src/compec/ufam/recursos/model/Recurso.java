@@ -8,7 +8,7 @@ import com.phill.libs.br.*;
 
 /** Modelagem de um recurso.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 30/OUT/2023 */
+ *  @version 3.0, 31/OUT/2023 */
 public class Recurso {
 
 	private LocalDateTime dataRecurso;
@@ -25,6 +25,7 @@ public class Recurso {
 		return this.dataRecurso;
 	}
 	
+	/** @return String formatada contendo a data de envio do recurso. */
 	public String getDataRecursoString() {
 		return this.dataRecurso == null ? null : this.dataRecurso.format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm:ss"));
 	}
