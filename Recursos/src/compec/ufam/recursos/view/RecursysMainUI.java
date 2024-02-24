@@ -29,7 +29,7 @@ import com.github.lgooddatepicker.components.*;
 
 /** Implementa a interface gráfica do sistema.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 31/OUT/2023 */
+ *  @version 3.5, 24/FEV/2024 */
 public class RecursysMainUI extends JFrame {
 
 	// Serial
@@ -37,7 +37,7 @@ public class RecursysMainUI extends JFrame {
 
 	// Declaração de atributos gráficos
 	private final JTextField textEdital, textDestino, textOrigem;
-	private final DatePicker pickerPublicacao;
+	private final DatePicker pickerPublicacao, pickerRetificacao;
 	private final JTable tablePlanilha;
     private final RecursoTableModel modelPlanilha;
     private final JLabel labelInfo;
@@ -59,6 +59,7 @@ public class RecursysMainUI extends JFrame {
 	
 	// Carregando bundle de idiomas
 	private final static PropertyBundle bundle = new PropertyBundle("i18n/portuguese", null);
+	private JCheckBox checkHeader;
 	
     /** Função principal instanciando a interface gráfica.
      *  @param args - argumentos do S.O. */
@@ -66,7 +67,7 @@ public class RecursysMainUI extends JFrame {
 
 	/** Construtor inicializando a interface gráfica. */
 	public RecursysMainUI() {
-		super("Recursys v.3.0");
+		super("Recursys v.3.5");
 		
 		// Inicializando atributos gráficos
 		GraphicsHelper instance = GraphicsHelper.getInstance();
@@ -89,45 +90,57 @@ public class RecursysMainUI extends JFrame {
 		// Painel 'Concurso'
 		JPanel panelConcurso = new JPanel();
 		panelConcurso.setBorder(instance.getTitledBorder("Concurso"));
-		panelConcurso.setBounds(10, 10, 780, 70);
+		panelConcurso.setBounds(10, 10, 780, 100);
 		panelConcurso.setLayout(null);
 		getContentPane().add(panelConcurso);
 		
-		JLabel labelEdital = new JLabel("Edital:");
+		JLabel labelEdital = new JLabel("Cabeçalho:");
 		labelEdital.setHorizontalAlignment(JLabel.RIGHT);
 		labelEdital.setFont(fonte);
-		labelEdital.setBounds(10, 30, 50, 20);
+		labelEdital.setBounds(10, 30, 85, 20);
 		panelConcurso.add(labelEdital);
 		
 		textEdital = new JTextField();
 		textEdital.setToolTipText(bundle.getString("hint-text-edital"));
 		textEdital.setFont(fonte);
 		textEdital.setForeground(color);
-		textEdital.setBounds(65, 30, 415, 25);
+		textEdital.setBounds(100, 30, 625, 25);
 		panelConcurso.add(textEdital);
 		
 		buttonEditalLimpa = new JButton(clearIcon);
 		buttonEditalLimpa.setToolTipText(bundle.getString("hint-button-edlimpa"));
 		buttonEditalLimpa.addActionListener((event) -> { textEdital.setText(null); textEdital.requestFocus(); } );
-		buttonEditalLimpa.setBounds(490, 30, 30, 25);
+		buttonEditalLimpa.setBounds(735, 30, 30, 25);
 		panelConcurso.add(buttonEditalLimpa);
 		
 		JLabel labelPublicacao = new JLabel("Publicação:");
 		labelPublicacao.setHorizontalAlignment(JLabel.RIGHT);
 		labelPublicacao.setFont(fonte);
-		labelPublicacao.setBounds(530, 30, 85, 20);
+		labelPublicacao.setBounds(10, 63, 85, 20);
 		panelConcurso.add(labelPublicacao);
 		
 		pickerPublicacao = LGoodDatePickerUtils.getDatePicker();
-		pickerPublicacao.getComponentDateTextField().setToolTipText(bundle.getString("hint-datepicker"));
+		pickerPublicacao.getComponentDateTextField().setToolTipText(bundle.getString("hint-date-publicacao"));
 		pickerPublicacao.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
-		pickerPublicacao.setBounds(620, 27, 145, 30);
+		pickerPublicacao.setBounds(100, 60, 145, 30);
 		panelConcurso.add(pickerPublicacao);
+		
+		JLabel labelRetificacao = new JLabel("Retificação:");
+		labelRetificacao.setHorizontalAlignment(JLabel.RIGHT);
+		labelRetificacao.setFont(fonte);
+		labelRetificacao.setBounds(255, 63, 85, 20);
+		panelConcurso.add(labelRetificacao);
+		
+		pickerRetificacao = LGoodDatePickerUtils.getDatePicker();
+		pickerRetificacao.getComponentDateTextField().setToolTipText(bundle.getString("hint-date-retificacao"));
+		pickerRetificacao.getComponentDateTextField().setHorizontalAlignment(JTextField.CENTER);
+		pickerRetificacao.setBounds(345, 60, 145, 30);
+		panelConcurso.add(pickerRetificacao);
 		
 		// Painel 'Planilhas de Entrada'
 		JPanel panelPlanilha = new JPanel();
 		panelPlanilha.setBorder(instance.getTitledBorder("Planilhas de Entrada"));
-		panelPlanilha.setBounds(10, 80, 780, 255);
+		panelPlanilha.setBounds(10, 110, 780, 255);
 		panelPlanilha.setLayout(null);
 		getContentPane().add(panelPlanilha);
 		
@@ -160,7 +173,7 @@ public class RecursysMainUI extends JFrame {
 		// Painel 'Pastas'		
 		JPanel panelPastas = new JPanel();
 		panelPastas.setBorder(instance.getTitledBorder("Pastas"));
-		panelPastas.setBounds(10, 335, 780, 105);
+		panelPastas.setBounds(10, 365, 780, 125);
 		panelPastas.setLayout(null);
 		getContentPane().add(panelPastas);
 		
@@ -204,15 +217,22 @@ public class RecursysMainUI extends JFrame {
 		buttonDestino.setBounds(735, 65, 30, 25);
 		panelPastas.add(buttonDestino);
 		
+		checkHeader = new JCheckBox("Ignorar verificação de cabeçalho");
+		checkHeader.setToolTipText(bundle.getString("hint-check-header"));
+		checkHeader.setHorizontalAlignment(JCheckBox.CENTER);
+		checkHeader.setFont(fonte);
+		checkHeader.setBounds(10, 95, 760, 20);
+		panelPastas.add(checkHeader);
+		
 		// Painel 'Console'
 		JPanel panelConsole = new JPanel();
 		panelConsole.setBorder(instance.getTitledBorder("Console"));
-		panelConsole.setBounds(10, 440, 780, 231);
+		panelConsole.setBounds(10, 490, 780, 215);
 		panelConsole.setLayout(null);
 		getContentPane().add(panelConsole);
 		
 		JScrollPane scrollConsole = new JScrollPane();
-		scrollConsole.setBounds(10, 25, 760, 194);
+		scrollConsole.setBounds(10, 25, 760, 180);
 		panelConsole.add(scrollConsole);
 		
 		textConsole = new JTextPane();
@@ -236,25 +256,25 @@ public class RecursysMainUI extends JFrame {
 		labelInfo.setHorizontalAlignment(JLabel.LEFT);
 		labelInfo.setFont(fonte);
 		labelInfo.setVisible(false);
-		labelInfo.setBounds(10, 685, 652, 20);
+		labelInfo.setBounds(10, 715, 650, 20);
 		getContentPane().add(labelInfo);
 		
 		buttonParse = new JButton(parseIcon);
 		buttonParse.setToolTipText(bundle.getString("hint-button-parse"));
 		buttonParse.addActionListener((event) -> actionParse());
-		buttonParse.setBounds(680, 683, 30, 25);
+		buttonParse.setBounds(680, 713, 30, 25);
 		getContentPane().add(buttonParse);
 		
 		buttonGabarito = new JButton(reportIcon);
 		buttonGabarito.setToolTipText(bundle.getString("hint-button-gabarito"));
 		buttonGabarito.addActionListener((event) -> actionGabarito());
-		buttonGabarito.setBounds(720, 683, 30, 25);
+		buttonGabarito.setBounds(720, 713, 30, 25);
 		getContentPane().add(buttonGabarito);
 		
 		buttonExport = new JButton(reportIcon);
 		buttonExport.setToolTipText(bundle.getString("hint-button-export"));
 		buttonExport.addActionListener((event) -> actionRespostas());
-		buttonExport.setBounds(760, 683, 30, 25);
+		buttonExport.setBounds(760, 713, 30, 25);
 		getContentPane().add(buttonExport);
 		
 		createPopupMenu();
@@ -639,7 +659,7 @@ public class RecursysMainUI extends JFrame {
 		try {
 			
 			utilLockParseUI(true);
-			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable(), this); utilLockParseUI(false);
+			this.mapaRecursos = DirectoryParser.parse(sourceDir, utilGetColumnsFromTable(), this.checkHeader.isSelected(), this); utilLockParseUI(false);
 			
 		} catch (Exception exception) {
 			
@@ -665,7 +685,7 @@ public class RecursysMainUI extends JFrame {
 				List<Recurso> listaRecursos = entries.getValue();
 			
 				// Construindo o relatório e exportando pra PDF
-				Resposta.exportPDF(textEdital.getText(), pickerPublicacao.getDate(), planilha, listaRecursos, targetDir);
+				Resposta.exportPDF(textEdital.getText(), pickerPublicacao.getDate(), pickerRetificacao.getDate(), planilha, listaRecursos, targetDir);
 				
 			}
 			
@@ -777,5 +797,4 @@ public class RecursysMainUI extends JFrame {
 		}
 		
 	}
-	
 }

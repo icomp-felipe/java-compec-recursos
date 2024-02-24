@@ -12,23 +12,24 @@ import compec.ufam.recursos.model.*;
 
 /** Implementa métodos para análise e carregamento de dados das planilhas de recursos.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 31/OUT/2023 */
+ *  @version 3.5, 24/FEV/2024 */
 public class DirectoryParser {
 
 	/** Extrai os dados de todas as planilhas contidas em <code>directory</code> e seus subdiretórios par um mapa arquivo-recursos.
 	 *  @param directory - diretório contendo as planilhas para análise e extração de dados
 	 *  @param columns - índices das colunas
+	 *  @param ignoreHeader - ativa ou desativa a verificação de cabeçalho das planilhas de entrada
 	 *  @param ui - interface gráfica principal, para exibição de resultados
 	 *  @return Mapeamento 'arquivo-recursos' contendo em cada entrada o arquivo da planilha seguido com uma lista de recursos carregados a partir dela.
 	 *  @throws IOException quando as planilhas ou o diretório não podem ser lidos.  */
-	public static Map<File, List<Recurso>> parse(final File directory, final String[] columns, final RecursysMainUI ui) throws IOException {
+	public static Map<File, List<Recurso>> parse(final File directory, final String[] columns, final boolean ignoreHeader, final RecursysMainUI ui) throws IOException {
 		
 		final Map<File, List<Recurso>> mapaRecursos = new LinkedHashMap<File, List<Recurso>>();
 		final Integer[] indexes = utilGetExcelIndexes(columns);
 		
 		Files.walk(directory.toPath())
         	 .filter (path -> path.toFile().isFile() && path.toFile().getName().endsWith("xlsx"))
-        	 .forEach(path -> mapaRecursos.put(path.toFile(), ExcelReader.read(path.toFile(), indexes, ui)));
+        	 .forEach(path -> mapaRecursos.put(path.toFile(), ExcelReader.read(path.toFile(), indexes, ignoreHeader, ui)));
 		
 		return mapaRecursos;
 	}

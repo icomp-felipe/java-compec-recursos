@@ -16,7 +16,7 @@ import compec.ufam.recursos.parser.*;
 
 /** Implementa os métodos de extração de recursos de uma planilha do Excel.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 31/OUT/2023 */
+ *  @version 3.5, 24/FEV/2024 */
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -25,8 +25,10 @@ public class ExcelReader {
 	/** Realiza a leitura da planilha e extrai os dados para uma lista de recursos.
 	 *  @param planilha - planilha de dados
 	 *  @param indexes - índices das colunas
+	 *  @param ignoreHeader - ativa ou desativa a verificação de cabeçalho da planilha de entrada
+	 *  @param ui - interface gráfica principal
 	 *  @return Lista com todos os recursos contidos na planilha, ou 'null' se ocorrer alguma exceção ou se a planilha não estiver no formato certo. */
-	public static List<Recurso> read(final File planilha, final Integer[] indexes, final RecursysMainUI ui) {
+	public static List<Recurso> read(final File planilha, final Integer[] indexes, final boolean ignoreHeader, final RecursysMainUI ui) {
 		
 		// Instanciando a lista de recursos
 		final List<Recurso> listaRecursos = new ArrayList<Recurso>();
@@ -42,7 +44,7 @@ public class ExcelReader {
 			Iterator<Row> rowIterator = sheet.iterator();
 			
 			// Analisando o cabeçalho, caso seja diferente do declarado em 'Fields' a leitura é encerrada por aqui
-			if (!parseHeader(rowIterator.next(), indexes))
+			if (!ignoreHeader && !parseHeader(rowIterator.next(), indexes))
 				ui.error("Arquivo fora de formato!");
 			
 			// Caso o cabeçalho seja válido, é iniciada a extração dos dados a partir das linhas da planilha
