@@ -301,7 +301,7 @@ public class RecursysMainUI extends JFrame {
 		respostasValidator.addPermanent(labelOrigem , () -> this.mapaRecursos != null      , bundle.getString("rui-mfv-mapa"     ), false);
 		respostasValidator.addPermanent(labelDestino, () -> targetDir != null              , bundle.getString("rui-mfv-targetdir"), false);
 		
-		setSize(800, 750);
+		setSize(800, 780);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);

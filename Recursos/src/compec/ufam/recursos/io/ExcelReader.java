@@ -44,7 +44,7 @@ public class ExcelReader {
 			Iterator<Row> rowIterator = sheet.iterator();
 			
 			// Analisando o cabeçalho, caso seja diferente do declarado em 'Fields' a leitura é encerrada por aqui
-			if (!ignoreHeader && !parseHeader(rowIterator.next(), indexes))
+			if (!parseHeader(rowIterator.next(), ignoreHeader, indexes))
 				ui.error("Arquivo fora de formato!");
 			
 			// Caso o cabeçalho seja válido, é iniciada a extração dos dados a partir das linhas da planilha
@@ -126,17 +126,20 @@ public class ExcelReader {
 	
 	/** Verifica se o cabeçalho da planilha é igual ao declarado em 'Fields'.
 	 *  @param row - primeira linha da planilha
+	 *  @param ignoreHeader - ativa ou desativa a verificação de cabeçalho da planilha
 	 *  @param indexes - índices das colunas */
-	private static boolean parseHeader(final Row row, final Integer[] indexes) {
+	private static boolean parseHeader(final Row row, final boolean ignoreHeader, final Integer[] indexes) {
 		
-		for (Fields field: Fields.values())
+		if (!ignoreHeader)
+		
+			for (Fields field: Fields.values())
+				
+				// O único campo que pode ser nulo é o cargo, pois só o PSTEC possui
+				if (field == Fields.CARGO && indexes[field.getIndex()] == null) continue;
 			
-			// O único campo que pode ser nulo é o cargo, pois só o PSTEC possui
-			if (field == Fields.CARGO && indexes[field.getIndex()] == null) continue;
-		
-			// Caso contrário, verificar se existem as demais colunas na planilha
-			else if (!field.getHeader().toLowerCase().equals( getCellContent(row.getCell( indexes[field.getIndex()] )).toLowerCase() ))
-				return false;
+				// Caso contrário, verificar se existem as demais colunas na planilha
+				else if (!field.getHeader().toLowerCase().equals( getCellContent(row.getCell( indexes[field.getIndex()] )).toLowerCase() ))
+					return false;
 		
 		return true;
 	}
