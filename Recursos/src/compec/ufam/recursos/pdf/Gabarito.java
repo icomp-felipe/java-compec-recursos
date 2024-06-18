@@ -19,7 +19,7 @@ import compec.ufam.recursos.model.*;
 
 /** Classe responsável pela construção e exibição do relatório 'Resumo de Gabaritos'.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 31/OUT/2023 */
+ *  @version 3.5, 18/JUN/2024 */
 public class Gabarito {
 
 	/** Constrói e exibe o relatório 'Resumo de Gabaritos'.
@@ -57,6 +57,7 @@ public class Gabarito {
 	public static String compute(final Map<File, List<Recurso>> mapaRecursos) {
 
 		final StringBuilder builder = new StringBuilder();
+		int totalRecursos = 0;
 		
 		// Iterando por todas as entradas do mapa
 		for (Map.Entry<File, List<Recurso>> entries: mapaRecursos.entrySet()) {
@@ -66,7 +67,7 @@ public class Gabarito {
 			List<Recurso> listaRecursos = entries.getValue();
 			
 			// Calculando o título do objeto
-			builder.append("==> " + FilenameUtils.removeExtension(planilha.getName()) + "\n\n");
+			builder.append(String.format("==> %s (%d recursos)\n\n", FilenameUtils.removeExtension(planilha.getName()), listaRecursos.size()));
 			
 			// Filtra a lista por questão e decisão da banca
 			Map<Integer, Map<String, Recurso>> filtroQuestaoDecisao = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso::getQuestao, LinkedHashMap::new, Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1)));
@@ -76,7 +77,12 @@ public class Gabarito {
 				
 				Map<String, Recurso> mapaDecisoes = mapaQuestaoDecisoes.getValue();
 
-				builder.append(String.format("Questão %02d: %s\n", mapaQuestaoDecisoes.getKey(), mapaDecisoes.keySet()));
+				final int questao = mapaQuestaoDecisoes.getKey();
+				final Set<String> respostaBanca = mapaDecisoes.keySet();
+				final int qtdRecursos = count(listaRecursos, questao);
+				
+				totalRecursos += qtdRecursos;
+				builder.append(String.format("Questão %02d: %s (%d recurso%s)\n", questao, respostaBanca, qtdRecursos, qtdRecursos == 1 ? "" : "s"));
 				
 			}
 			
@@ -84,8 +90,18 @@ public class Gabarito {
 			
 		}
 		
+		builder.append("=====> Total de recursos processados: " + totalRecursos + " <=====");
+		
 		return builder.toString().trim();
 		
+	}
+	
+	/** Conta a quantidade de recursos por questão de uma <code>listaRecursos</code>.
+	 *  @param listaRecursos - Lista de recursos
+	 *  @param questao - Número da questão
+	 *  @return Quantidade de recursos por questão de uma <code>listaRecursos</code>. */
+	private static int count(final List<Recurso> listaRecursos, final int questao) {
+		return (int) listaRecursos.stream().filter(q -> q.getQuestao() == questao).count();
 	}
 	
 }
