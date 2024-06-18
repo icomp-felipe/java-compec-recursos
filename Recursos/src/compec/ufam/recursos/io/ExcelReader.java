@@ -160,7 +160,7 @@ public class ExcelReader {
 		
 		final Cell cell = row.getCell( indexes[Fields.TIMESTAMP.getIndex()] );
 		
-		return cell == null ? null : cell.getLocalDateTimeCellValue();
+		try { return cell.getLocalDateTimeCellValue(); } catch (Exception exception) { return null; }
 	}
 	
 	/** Extrai o nome do candidato.
