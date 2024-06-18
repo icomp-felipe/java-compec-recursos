@@ -6,6 +6,7 @@ import java.time.*;
 import java.util.*;
 
 import com.phill.libs.*;
+import com.phill.libs.ui.AlertDialog;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
@@ -92,9 +93,14 @@ public class ExcelReader {
 		catch (Exception exception) {
 			
 			exception.printStackTrace();
+			AlertDialog.error(ui, ui.getTitle(), ui.getBundle().getFormattedString("xlsread-error", planilha.getName()));
 			return null;
 			
 		}
+		
+		// Ordenando lista por número de questão e por nome de candidato
+		Collections.sort(listaRecursos, Comparator.comparing    (Recurso::getQuestao)
+				                                  .thenComparing(Recurso::getNomeNormalizado));
 		
 		return listaRecursos;
 	}

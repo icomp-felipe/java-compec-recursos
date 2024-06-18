@@ -62,3 +62,7 @@ rui-thread-parser-error = Falha ao analisar planilhas!\n\
 rui-thread-respostas-success = Respostas aos recursos exportadas com sucesso!
 rui-thread-respostas-error   = Falha ao exportar as respostas aos recursos!\n\
                                Verifique o console para mais informações.
+
+! ExcelReader::read
+xlsread-error = Falha ao recuperar dados da planilha '%s'!\n\
+                Verifique o console para mais informações.

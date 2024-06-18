@@ -439,6 +439,10 @@ public class RecursysMainUI extends JFrame {
 	
 	/************************* Bloco de Métodos Utilitários *******************************/
 	
+	public PropertyBundle getBundle() {
+		return bundle;
+	}
+	
 	/** Recupera as colunas configuradas na tabela para um array de strings.
 	 *  @return Array contendo as colunas configuradas na tabela. */
 	private String[] utilGetColumnsFromTable() {
@@ -647,7 +651,7 @@ public class RecursysMainUI extends JFrame {
 		catch (Exception exception) {
 				
 			exception.printStackTrace(); utilLockGabaritoUI(false);
-			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-gabarito-pdferror"));
+			AlertDialog.error(this, getTitle(), bundle.getString("rui-thread-gabarito-error"));
 				
 		}
 		
