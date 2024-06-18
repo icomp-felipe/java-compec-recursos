@@ -11,7 +11,7 @@ import compec.ufam.recursos.model.*;
 
 /** Implementa os verificadores de integridade dos dados de um {@link Recurso}.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.0, 31/OUT/2023 */
+ *  @version 3.5, 18/JUN/2024 */
 public class RecursoParser {
 
 	/** Realiza uma série de verificações de integridade dos dados de um <code>recurso</code> e exibe na <code>ui</code>.
@@ -24,7 +24,11 @@ public class RecursoParser {
 		
 		// Validação da data de envio do recurso
 		if (recurso.getDataRecurso() == null)
-			ui.warning("Linha %d: Impossível recuperar data de envio", linha);
+			ui.warning("Linha %d: Não foi possível recuperar data de envio", linha);
+		
+		// Validação do número de questão
+		if (recurso.getQuestao() == 0)
+			ui.warning("Linha %d: Não foi possível extrair o número de questão", linha);
 		
 		// Validação do nome do candidato
 		if (recurso.getNomeCandidato() == null || recurso.getNomeCandidato().isBlank())

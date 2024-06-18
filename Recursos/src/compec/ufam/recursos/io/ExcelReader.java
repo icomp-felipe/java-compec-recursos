@@ -17,7 +17,7 @@ import compec.ufam.recursos.parser.*;
 
 /** Implementa os métodos de extração de recursos de uma planilha do Excel.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.5, 24/FEV/2024 */
+ *  @version 3.5, 18/JUN/2024 */
 public class ExcelReader {
 
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -220,8 +220,8 @@ public class ExcelReader {
 	 *  @return Número da questão recursada. */
 	private static Integer getQuestao(final Row row, final Integer[] indexes) {
 		
-		try { return Integer.parseInt( getCellContent(row.getCell( indexes[Fields.QUESTAO.getIndex()] )) );	}
-		catch (Exception exception) { return null; }
+		try { return Integer.parseInt( StringUtils.extractNumbers(getCellContent(row.getCell( indexes[Fields.QUESTAO.getIndex()] )) ) );	}
+		catch (Exception exception) { return 0; }
 		
 	}
 	
