@@ -17,7 +17,7 @@ public class ListParser {
 	public static void parse(final List<Recurso> listaRecursos, final RecursysMainUI ui) {
 		
 		// Verificando se existem diferentes disciplinas
-		Map<String, Recurso> mapaDisciplinas = listaRecursos.stream().collect(Collectors.toMap(Recurso::getDisciplina, recurso -> recurso, (recurso1, recurso2) -> recurso1));
+		Map<String, Recurso> mapaDisciplinas = listaRecursos.stream().collect(Collectors.toMap(Recurso::getDisciplina, recurso -> recurso, (recurso1, _) -> recurso1));
 		
 		if (mapaDisciplinas.size() > 1)
 			ui.warning("Existem %d disciplinas no mesmo arquivo: %s", mapaDisciplinas.size(), Arrays.toString(mapaDisciplinas.keySet().toArray()));
@@ -30,7 +30,7 @@ public class ListParser {
 		for (List<Recurso> recursosAgrupados: mapaQuestoes.values()) {
 			
 			// Agrupando recursos por decisão
-			Map<String, Recurso> mapaDecisoes = recursosAgrupados.stream().collect(Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, recurso2) -> recurso1));
+			Map<String, Recurso> mapaDecisoes = recursosAgrupados.stream().collect(Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, _) -> recurso1));
 			
 			if (mapaDecisoes.size() > 1)
 				ui.warning("Questão %d possui diferentes decisões: %s", recursosAgrupados.getFirst().getQuestao(), Arrays.toString(mapaDecisoes.keySet().toArray()));

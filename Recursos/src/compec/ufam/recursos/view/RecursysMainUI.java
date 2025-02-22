@@ -109,7 +109,7 @@ public class RecursysMainUI extends JFrame {
 		
 		buttonEditalLimpa = new JButton(clearIcon);
 		buttonEditalLimpa.setToolTipText(bundle.getString("hint-button-edlimpa"));
-		buttonEditalLimpa.addActionListener((event) -> { textEdital.setText(null); textEdital.requestFocus(); } );
+		buttonEditalLimpa.addActionListener((_) -> { textEdital.setText(null); textEdital.requestFocus(); } );
 		buttonEditalLimpa.setBounds(735, 30, 30, 25);
 		panelConcurso.add(buttonEditalLimpa);
 		
@@ -193,7 +193,7 @@ public class RecursysMainUI extends JFrame {
 		
 		buttonOrigem = new JButton(searchIcon);
 		buttonOrigem.setToolTipText(bundle.getString("hint-button-origem"));
-		buttonOrigem.addActionListener((event) -> actionSelectOrigem());
+		buttonOrigem.addActionListener((_) -> actionSelectOrigem());
 		buttonOrigem.setBounds(735, 30, 30, 25);
 		panelPastas.add(buttonOrigem);
 		
@@ -213,7 +213,7 @@ public class RecursysMainUI extends JFrame {
 		
 		buttonDestino = new JButton(searchIcon);
 		buttonDestino.setToolTipText(bundle.getString("hint-button-destino"));
-		buttonDestino.addActionListener((event) -> actionSelectDestino());
+		buttonDestino.addActionListener((_) -> actionSelectDestino());
 		buttonDestino.setBounds(735, 65, 30, 25);
 		panelPastas.add(buttonDestino);
 		
@@ -261,19 +261,19 @@ public class RecursysMainUI extends JFrame {
 		
 		buttonParse = new JButton(parseIcon);
 		buttonParse.setToolTipText(bundle.getString("hint-button-parse"));
-		buttonParse.addActionListener((event) -> actionParse());
+		buttonParse.addActionListener((_) -> actionParse());
 		buttonParse.setBounds(680, 713, 30, 25);
 		getContentPane().add(buttonParse);
 		
 		buttonGabarito = new JButton(reportIcon);
 		buttonGabarito.setToolTipText(bundle.getString("hint-button-gabarito"));
-		buttonGabarito.addActionListener((event) -> actionGabarito());
+		buttonGabarito.addActionListener((_) -> actionGabarito());
 		buttonGabarito.setBounds(720, 713, 30, 25);
 		getContentPane().add(buttonGabarito);
 		
 		buttonExport = new JButton(reportIcon);
 		buttonExport.setToolTipText(bundle.getString("hint-button-export"));
-		buttonExport.addActionListener((event) -> actionRespostas());
+		buttonExport.addActionListener((_) -> actionRespostas());
 		buttonExport.setBounds(760, 713, 30, 25);
 		getContentPane().add(buttonExport);
 		
@@ -317,7 +317,7 @@ public class RecursysMainUI extends JFrame {
 		KeyStroke limpar = KeyStroke.getKeyStroke(KeyEvent.VK_L, 0);
 		
 		// Definindo ações dos itens de menu
-		Action actionLimpar = new ShortcutAction("Limpar", KeyEvent.VK_L, limpar,(event) -> textConsole.setText(null));
+		Action actionLimpar = new ShortcutAction("Limpar", KeyEvent.VK_L, limpar,(_) -> textConsole.setText(null));
 		
 		// Declarando os itens de menu
 		JMenuItem itemLimpar = new JMenuItem(actionLimpar);
