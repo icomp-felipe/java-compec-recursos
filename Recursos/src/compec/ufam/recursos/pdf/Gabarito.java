@@ -19,7 +19,7 @@ import compec.ufam.recursos.model.*;
 
 /** Classe responsável pela construção e exibição do relatório 'Resumo de Gabaritos'.
  *  @author Felipe André - felipeandre.eng@gmail.com
- *  @version 3.5, 18/JUN/2024 */
+ *  @version 3.5, 15/MAI/2025 */
 public class Gabarito {
 
 	/** Constrói e exibe o relatório 'Resumo de Gabaritos'.
@@ -66,8 +66,10 @@ public class Gabarito {
 			File planilha = entries.getKey();
 			List<Recurso> listaRecursos = entries.getValue();
 			
+			final int recursosDisciplina = listaRecursos.size();
+			
 			// Calculando o título do objeto
-			builder.append(String.format("==> %s (%d recursos)\n\n", FilenameUtils.removeExtension(planilha.getName()), listaRecursos.size()));
+			builder.append(String.format("==> %s (%d recurso%s)\n\n", FilenameUtils.removeExtension(planilha.getName()), recursosDisciplina, recursosDisciplina == 1 ? "" : "s"));
 			
 			// Filtra a lista por questão e decisão da banca
 			Map<Integer, Map<String, Recurso>> filtroQuestaoDecisao = listaRecursos.stream().filter(recurso -> recurso.getQuestao() != null).collect(Collectors.groupingBy(Recurso::getQuestao, LinkedHashMap::new, Collectors.toMap(Recurso::getDecisaoBanca, recurso -> recurso, (recurso1, _) -> recurso1)));
