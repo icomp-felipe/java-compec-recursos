@@ -28,7 +28,7 @@ public class DirectoryParser {
 		final Integer[] indexes = utilGetExcelIndexes(columns);
 		
 		Files.walk(directory.toPath())
-        	 .filter (path -> path.toFile().isFile() && path.toFile().getName().endsWith("xlsx"))
+        	 .filter (path -> path.toFile().isFile() && path.toFile().getName().endsWith("xlsx") && !path.toFile().getName().startsWith("~$"))
         	 .forEach(path -> mapaRecursos.put(path.toFile(), ExcelReader.read(path.toFile(), indexes, ignoreHeader, ui)));
 		
 		return mapaRecursos;
