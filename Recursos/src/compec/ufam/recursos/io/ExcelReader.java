@@ -180,7 +180,8 @@ public class ExcelReader {
 		final Cell cell = row.getCell( indexes[Fields.CPF.getIndex()] );
 		String rawData = StringUtils.extractNumbers(getCellContent(cell));
 		
-		return rawData == null ? null : String.format("%011d", Long.parseLong(rawData));
+		try { return String.format("%011d", Long.parseLong(rawData)); }
+		catch (Exception exception) { return null; }
 	}
 	
 	/** Extrai o número de inscrição do candidato.
